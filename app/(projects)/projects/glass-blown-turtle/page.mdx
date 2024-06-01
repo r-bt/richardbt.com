@@ -1,5 +1,13 @@
 import thumbnail from "./thumbnail.jpg";
 import ProjectLayout from "@/components/ProjectLayout";
+import ProjectImage from "@/components/ProjectImage";
+// Images
+import irishPaperWeight from "./irish-paper-weight.jpg";
+import ornament from "./ornament.jpg";
+import pumpkin from "./pumpkin.jpg";
+import pineappleCup from "./pineapple-cup.jpg";
+import ruffleBowl from "./ruffle-bowl.jpg";
+
 
 export const metadata = {
     thumbnail,
@@ -9,7 +17,25 @@ export const metadata = {
     categories: ["glass", "all"],
 };
 
-## Overview
+I am lucky to be part of the MIT glass blowing lab where I get to make all sorts of cool things **out of glass!**. I've currently taken the beginner class twice (Fall 2022 & Fall 2023) and the intermeditate class once (Spring 2024). 
+
+The last week of begineer is always a project week where you can make anything you want. I decided to make a turtle.
+
+<ProjectImage src={thumbnail} alt="Glassblown turtle" />
+
+## Other Glass Creations
+
+I've made some other things in the glass lab. Here are some of my favorites:
+
+<ProjectImage src={irishPaperWeight} alt="A paperweight with the Irish flag colors" />
+
+<ProjectImage src={ornament} alt="An ornament" />
+
+<ProjectImage src={pineappleCup} alt="A cup circled with bubbles with a blue lip wrap" />
+
+<ProjectImage src={pumpkin} alt="My basic attempt at making a glass pumpkin" />
+
+<ProjectImage src={ruffleBowl} alt="A ruffle bowl with a blue lip wrap" />
  
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
