@@ -1,0 +1,164 @@
+import thumbnail from "./thumbnail.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+import SideBySide from "@/components/SideBySide";
+import ProjectImage from "@/components/ProjectImage";
+// Images
+import badDalle1 from "./bad-dalle-1.png";
+import badDalle2 from "./bad-dalle-2.png";
+import badDalle3 from "./bad-dalle-3.png";
+import badDalle4 from "./bad-dalle-4.png";
+import goodDalle1 from "./good-dalle-1.png";
+import goodDalle2 from "./good-dalle-2.png";
+import roughCad from "./rough-cad.png";
+import flatPattern from "./flat-pattern.png";
+import bodyBase from "./body-base.png";
+import bodyWalls from "./body-walls.png";
+import headArms from "./head-arms.png";
+import tailLip from "./tail-lip.png";
+import internalWalls from "./internal-walls.png";
+import everythingCut from "./everything-cut.jpg";
+import sewing from "./sewing.jpg";
+import vinyl from "./vinyl.jpg";
+import completed from "./completed.jpg";
+import inflated1 from "./inflated1.jpg";
+import inflated2 from "./inflated2.jpg";
+
+export const metadata = {
+    thumbnail,
+    title: "Giant Inflatable Pigeon",
+    publishDate: '2022-12-14T00:00:00Z',
+    description: "A large inflatable shaped like a pigeon. Designed in Fusion 360 and cut on the Zund.",
+    categories: ["all", "maker"],
+};
+
+I have this friend – [Andi](https://mitadmissions.org/blogs/author/andiqu/). He's obsessed with pigeons. We went to New York for one Thanksgiving and after a while walking through New York City realised we'd lost him. After frantically retracing our steps we eventually found him fawing over the pigeons. Apparantly they were are soooo different to South African pigeons. Anyway, I thought it would be funny to make a giant inflatable pigeon.
+
+## What does a giant inflatable pigeon look like?
+
+Have no fear Dall-E is here. 
+
+<SideBySide 
+  left={<ProjectImage src={badDalle2} alt="Bad Dall-E Image" />} 
+  right={<ProjectImage src={badDalle1} alt="Bad Dall-E Image" />} 
+/>
+
+<SideBySide 
+  left={<ProjectImage src={badDalle3} alt="Bad Dall-E Image" />} 
+  right={<ProjectImage src={badDalle4} alt="Bad Dall-E Image" />} 
+/>
+
+Ehhh. Maybe not those, but with a bit of prompt engineering I got these two which I based my inflatable around. 
+
+<SideBySide 
+  left={<ProjectImage src={goodDalle1} alt="A good Dall-E Image – I like how the abs look here" />} 
+  right={<ProjectImage src={goodDalle2} alt="A good Dall-E Image - I like the recess in the middle" />}
+/>
+
+## Design Goals
+
+Specifically I wanted to 
+- Add creases to the fabric in front to create the impression of abs
+- Have a head, beak, tail, and two strong arms
+- Have a recess in the middle for someone to sit in.
+
+## Desiging in Fusion
+
+So using Fusion is definetely not how inflatables are normally done (they're usually more like stuffed animals where you design 2D sewing patterns in something like illustrator, etc), but I wanted to continue exploring the Sheet Metal tool.
+
+The basic flow for using sheet metal is supposed to be:
+- Sketch your piece
+- Flange it out
+- Add bends / lofts / etc
+- Click the **Create flat pattern** button and instantly get a flat pattern
+
+Unfortunally, this just didn't work. To begin I sketched two ellipses and lofted them together with the flange tool. 
+
+<ProjectImage src={roughCad} alt="A rough CAD I made 2D designs based off" />
+
+Then I tried to make a flat pattern. 
+
+<ProjectImage src={flatPattern} alt="A 3D object in my supposed 'flat' pattern" />
+
+But it just came out 3D. Ok, but I forgot to include a gap in the ellipse so there's no where that it can fold 
+
+So then I included a gap and still there was no luck. I unfortunally messed up my Fusion history so much that I've got no pictures so show of here.
+
+So, after trying the above and a lot more for a few hours, I eventually just took what I had made and started sketching 2D profiles. 
+
+First was the base of the pigeon. For this I drew an ellipse of width 55cm and length 30cm
+
+<ProjectImage src={bodyBase} alt="Base of the pigeon body" />
+
+Then the body of the pigeon. This was going to be a rectangle which wrapped around the ellipse base and acted as wall. I calculated the cirfumerence of the ellipse with which would be sewed together to make the ellipse wall. I was space constrained since I only wanted to use orange
+
+<ProjectImage src={bodyWalls} alt="Walls of the pigeon body" />
+
+Next up was the head and arms. For the head I used the spline tool to draw which looked sort of head shaped, and for the arms I drew a rectangle attached to a circle. The rectangle will be wrapped around and sewn to the circle to give a buff arm impression.
+
+<ProjectImage src={headArms} alt="Head and arms of the pigeon" />
+
+Then was the tail (just a rectangle with a square on the end), another arm, and also the top of the pigeon. I wanted to make a lip which would attach to a smaller inner ellipse wall. I copied by base ellipse and offset it inwards so I'd cut out both the lip and inner ellipse in one go. 
+
+<ProjectImage src={tailLip} alt="Tail and lip of the pigeon" />
+
+Finally, there was the wall for the inner ellipse. Exactly like before this was 2 rectangles 
+
+<ProjectImage src={internalWalls} alt="Internal walls of the pigeon" />
+
+## Cutting it on the Zund 
+
+The Mars Lab in the Media lab has a The Zund which is a flexible and precise gantry machine which has modular end effectors. Basically it can do anything you would want to do in 2.5 axis. For my casee I just wanted to cut.
+
+I exported all my sketches as DXFs and sent them to the lab staff member. We had some slight concerns with the size of my fabrics. In my quest to make everything (bar the base and beak) orange I hadn't left much clearance between the pieces and side (like ~1cm) but in the end in turns out all my measurements had been wrong which was great here since it left some extra room and everything ended up cutting great :)
+
+<ProjectImage src={everythingCut} alt="All the cut pieces" />
+
+## Sewing this together
+
+This took much longer than I thought it would (8 hours) and a lot of stuff went wrong so I'll list them out here:
+
+### Refilling a bobbin 
+
+Keeping with the theme, I wanted to use orange thread. Since there was a lot of stuff my bobbin eventually ran out (actually it ran out twice), which meant I needed to refill it. Unfortunally, I set this up wrong the first time and when I told the machine to start spinning the thread slipped off the bobbin and wrapped around the underneath part. It wasn't pretty but thankfully, I was able to take off the bobbin and easily cut the thread.
+
+### Sewed all the way around 
+
+For the abs my plan was to sew a crease on the front part. Unfortunally, while doing this I forget to do just the front part and sewed the crease all the way around. After asking around some people suggested I use a sew ripper to get it out 
+
+Before this I had never used a seam ripper, and thought they were some magical tool which made removing seams super easy.
+
+**False.**
+
+Seam rippers are just tiny sharp edges which you can stick underneath a seam to try get it out, but it's incredibly tedious. So I spend the next hour going in and out of my seams to remove it. 
+
+### Orientation
+
+Orientation with sewed pieces is hard. I sewed the beak onto the head first and then onto the body. Except the head came out backwards. Ok, I got my trusty seamripper, and took it off. And then sewed it back on in a different orientation. Yep, it was different. A different kind of backwards. So I called over Alayah, who gets this spatial stuff much better than me, and we eventually figured out which pieces had to be sewed together to get it to work right.
+
+## Vinyl cutting eyes
+
+Once everything was made (a.k.a 8 hours later at 10pm) it was time to add on the eyes. I got some heat-on Vinyl, plugged in the iron and cut out white and red circles (technically pigeon eyes are usually orange, but I'd already used so much of that and sometimes the eyes are red so I'll go with it). Then I placed the vinyl on (careful to have shiny side up), heated it with the iron and then removed the basic. Viola, the eyes
+
+<ProjectImage src={vinyl} alt="Heat-on Vinyl" />
+
+And finally, everything was ready to test 
+
+<ProjectImage src={completed} alt="Completed pigeon" />
+
+I got a hair dryer, plugged it into the back and voila 
+
+<SideBySide 
+  left={<ProjectImage src={inflated1} alt="Inflated pigeon 1" />} 
+  right={ <ProjectImage src={inflated2} alt="Inflated pigeon 2" />} 
+/>
+
+<video controls width="250" className="w-full">
+    <source src="/inflating.mp4"
+            type="video/mp4" />
+</video>
+
+
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

@@ -1,0 +1,3 @@
+- https://fab.cba.mit.edu/classes/863.21/Harvard/people/jant/14_final_project/
+- https://courses.csail.mit.edu/6.857/2014/files/07-alsibyani-mickel-vasquez-zhang-distributed-settlers-of-catan.pdf
+- https://hackaday.com/2022/05/27/electronic-catan-game-board-is-modular/

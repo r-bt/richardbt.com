@@ -1,0 +1,77 @@
+import thumbnail from "./thumbnail.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+import ProjectImage from "@/components/ProjectImage";
+import ModelViewer from "@/components/ModelViewer";
+import SideBySide from "@/components/SideBySide";
+// Images
+import captainsQuarters from "./captains-quarters.png";
+import shipWallPosts from "./ship-wall-posts.png";
+import shipWheel from "./ship-wheel.png";
+import sailsOnShip from "./sails-on-ship.png";
+import pirateShipRender from "./pirate-ship-render.png";
+import sketchOfShipHull from "./sketch-of-ship-hull.png";
+import wheelOnShip from "./wheel-on-ship.png";
+import slicingPirateShip from "./slicing-pirate-ship.jpg";
+import finishedPirateShip from "./finished-pirate-ship.jpg";
+import finishedPirateShip2 from "./finished-pirate-ship2.jpg";
+// 3D Models
+import {Model} from "./PirateShip";
+
+export const metadata = {
+  publishDate: '2022-11-04T00:00:00Z',
+  thumbnail,
+  title: "Pirate Ship",
+  description: "A 3D printed pirate ship with sails and internal hull",
+  categories: ["maker", "all"],
+};
+
+For my week 4 assignment for How to Make Almost Anything (HTMAA) (6.9020), I desinged and printed a pirate ship. I wanted to improve my Fusion 360 skills and also try out the soluble supports on the Ultimaker S5.
+
+## Designing the Pirate Ship
+
+To begin I sketched out the different profiles of the ship's hull. I included a spline at the bottom and top of the end piece to use as a rail while lofting to get a ship's distinctive curved end.
+
+<ProjectImage src={sketchOfShipHull} alt="Sketch of ship hull" />
+
+Next up I extruded and cut a rectangular section into the front of the boat where the captain's quarters would be.
+
+<ProjectImage src={captainsQuarters} alt="Adding captain's quarters" />
+
+Then was the posts at the side of the boat.
+
+<ProjectImage src={shipWallPosts} alt="Sketching and revolving ship wall posts" />
+
+In a new file, I then desinged a ship wheel which I linked into the ship.
+
+<ProjectImage src={shipWheel} alt="Ship Wheel" />
+
+<ProjectImage src={wheelOnShip} alt="Wheel on the ship" />
+
+After some more adventures with lofting I added the masts and sails. I tried to emulate the effect of wind on the sails by creating splines in a 3D sketch which I used as a rails when lofting between the curved top and bottom of the sail.
+
+<ProjectImage src={sailsOnShip} alt="Sails on the ship" />
+
+All together it looks like:
+
+<ModelViewer cameraPosition={[0, 500, 1000]}>
+  <Model position={[150, -100, 0]}/>
+</ModelViewer>
+
+## 3D Printing
+    
+One of the Makerspaces at MIT has an Ultimaker S5, a dual extruder printer which uses PVA for water soluable supports. 
+
+While the deck of the boat might of been able to print without supports (by using bridging), the sails definetely needed supports so my plan was to print the ship with PVA and then dissolve the supports away.
+
+<ProjectImage src={slicingPirateShip} alt="Slicing pirate ship in Cura" />
+
+Unfortunally, I forgot to take a picture of it with all the water soluable supports but there was a ton. It took 5 days in a bath of water for everything to dissolve. I also realised once I put it in water that it didn't actually function as a boat and in fact sinks. I'm not too disappointed since I didn't design it to float, but in the future I'd love to try make a boat that does.
+
+<SideBySide 
+  left={<ProjectImage src={finishedPirateShip} alt="Side view of finished pirate ship" />} 
+  right={ <ProjectImage src={finishedPirateShip2} alt="Back view of finished pirate ship" />} 
+/>
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

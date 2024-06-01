@@ -1,0 +1,16 @@
+import thumbnail from "./thumbnail.png";
+import ProjectLayout from "@/components/ProjectLayout";
+
+export const metadata = {
+  publishDate: '2020-10-30T00:00:00Z',
+  thumbnail,
+  title: "Prepsheets",
+  description: "A SaaS platform for managing recipes and ingredient lists for hospitality businesses.",
+  categories: ["software", "all"],
+};
+
+## Overview
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

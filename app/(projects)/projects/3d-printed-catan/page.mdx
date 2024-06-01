@@ -1,0 +1,16 @@
+import thumbnail from "./thumbnail.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+
+export const metadata = {
+  publishDate: '2024-03-23T00:00:00Z',
+  thumbnail,
+  title: "3D Printed Catan",
+  description: "A custom designed 3D printed Settlers of Catan board",
+  categories: ["maker", "all"],
+};
+
+## Overview
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

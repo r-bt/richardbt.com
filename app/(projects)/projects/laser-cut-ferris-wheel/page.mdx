@@ -1,0 +1,53 @@
+import thumbnail from "./thumbnail.jpg";
+import sheetMetalBox from "./sheet-metal-box.png";
+import laserCuttingParts from "./laser-cutting-parts.jpg";
+import finishedFerrisWheel from "./finished-ferris-wheel.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+import ProjectImage from "@/components/ProjectImage";
+import ModelViewer from "@/components/ModelViewer";
+import {Model} from "./FerrisWheel";
+import SideBySide from "@/components/SideBySide";
+
+export const metadata = {
+    thumbnail,
+    title: "Laser Cut Ferris Wheel",
+    publishDate: '2022-09-21T00:00:00Z',
+    description: "A laser-cut ferris wheel designed in Fusion 360",
+    categories: ["maker", "all"],
+};
+
+I built this working Ferris Wheel as my week two assignment for How to Make Almost Anything (HTMAA) (6.9020). My objective was to learn about parametric design, [living hinges](https://en.wikipedia.org/wiki/Living_hinge), and wooden joints. All the pieces were designed first in Fusion 360 before being laser cut and assembled. No glue is used anywhere.    
+ 
+## Designing the Ferris Wheel
+
+I split my design into two parts:
+
+1. The Ferris Wheel itself
+2. The base
+
+For the base I wanted to visualize how the sides would bend so I used the **Sheet Metal** tool in Fusion 360. This allowed me to fit together while bent, but export as a flatten DXF file for laser cutting in the end. I used a reference image for my living hinges and rectangular pattenered it on the sides of the base.
+
+<ProjectImage src={sheetMetalBox} alt="Extruded Sheet Metal Base" />
+
+For the Ferris Wheel, I designed everything in sketches and extruded them. All the pieces have finger joints and I used the **Joint** tool to make sure everything fitted together in the end.
+
+<ModelViewer cameraPosition={[0, 200, 600]}>
+  <Model position={[0, -200, 0]}/>
+</ModelViewer>
+
+## Laser cutting the parts
+
+To actually laser cut the parts I needed to account for kerf. Thankfully there is a Fusion360 plugin, [DXF For Laser](https://apps.autodesk.com/FUSION/en/Detail/Index?id=7634902334100976871&os=Win64&appLang=en), which can create **.dxf** files from your bodies faces and offsets the dimensions to account for kerf.
+
+I exported all my bodies as .dxf files, made some test cuts, and then cut all of them out.
+
+It took a few tries to get the kerf right, but in the end, and with the help of a pallet, everything fitted together.
+
+<SideBySide 
+  left={<ProjectImage src={laserCuttingParts} alt="Laser cutting the parts" />}
+  right={<ProjectImage src={finishedFerrisWheel} alt="Assembled Ferris Wheel" />}
+/>
+
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

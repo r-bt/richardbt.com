@@ -1,0 +1,16 @@
+import thumbnail from "./thumbnail.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+
+export const metadata = {
+    thumbnail,
+    title: "Feline Programmable Gate Array",
+    publishDate: '2023-12-14T00:00:00Z',
+    description: "A robot that listens for its owners voice and moves towards them. Powered by an FPGA",
+    categories: ["robots", "all", "highlights", "electronics"],
+};
+
+## Overview
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

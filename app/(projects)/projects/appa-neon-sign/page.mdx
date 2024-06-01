@@ -1,0 +1,53 @@
+import thumbnail from "./thumbnail.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+import ProjectImage from "@/components/ProjectImage";
+// Images
+import addingTheWires from "./adding-the-wires.jpg";
+import camPreview from "./cam-preview.png";
+import routerJob from "./router-job.jpg";
+
+export const metadata = {
+  publishDate: '2023-09-18T00:00:00Z',
+  thumbnail,
+  title: "Appa Neon Sign",
+  description: "An LED neon sign of Appa from Avatar: The Last Airbender",
+  categories: ["maker", "all"],
+};
+
+I am one of the TAs for [ES.100](http://student.mit.edu/catalog/search.cgi?search=ES.100) – Introduction to Maker Skills. For the 2023 semester we got funding to run an LED Neon Sign making workshop. I decided to make an Appa sign to test out the process.
+
+## Designing the Sign
+
+I started by finding a good image of Appa. I then used Adobe Illustrator to convert the image into a vector of just lines. 
+
+Then I offset all the paths to make the outline of the sign. 
+
+The LED strips I used came in increments of 1in so I made sure to design the sign to fit within those constraints.
+
+## Setting up the CAM
+
+Once designed, I put the file into Fusion360 and setup the CAM. I used a 1/8" endmill to cut out the sign from a 1/4" sheet of acrylic.
+
+<ProjectImage src={camPreview} alt="Simulated CAM job in Fusion 360" />
+
+## Cutting the Sign
+
+Then I cut out the sign on the Shopbot CNC router.
+
+<ProjectImage src={routerJob} alt="Sign being cut on CNC router" />
+
+## Wiring the Sign
+
+This was the hardest part. I had to cut out the LED strips to fit into the different channels. Then I had solder them together and wrap the exposed wires in heat shrink to prevent shorts. 
+
+<ProjectImage src={addingTheWires} alt="Adding the wires to channels" />
+
+Since the copper pads on the LED strips were so small I had to used hot glue as a mechanical stress relief
+
+Finally, I connected the sign to a 12V power supply and it lit up!
+
+<ProjectImage src={thumbnail} alt="Completed Sign" />
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

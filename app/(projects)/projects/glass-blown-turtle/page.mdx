@@ -1,0 +1,16 @@
+import thumbnail from "./thumbnail.jpg";
+import ProjectLayout from "@/components/ProjectLayout";
+
+export const metadata = {
+    thumbnail,
+    title: "Glass Blown Turtle",
+    publishDate: '2022-12-05T00:00:00Z',
+    description: "A glass blown turtle with intricate patterns and colors",
+    categories: ["glass", "all"],
+};
+
+## Overview
+ 
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}
