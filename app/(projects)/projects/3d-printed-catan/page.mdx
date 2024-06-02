@@ -1,5 +1,19 @@
 import thumbnail from "./thumbnail.jpg";
 import ProjectLayout from "@/components/ProjectLayout";
+import ProjectImage from "@/components/ProjectImage";
+import SideBySide from "@/components/SideBySide";
+import ModelViewer from "@/components/ModelViewer";
+// Images
+import mountainWithCutouts from "./mountain-with-cutouts.png";
+import mountainTextured from "./mountain-textured.png";
+import mountainBase from "./mountain-base.png";
+import mountainWithTracks from "./mountain-with-tracks.png";
+import mountainWithPatternedBarsOffset from "./mountain-with-patterned-bars-offset.png";
+import mountainWithBars from "./mountain-with-bars.png";
+import minecartWithCoal from "./minecart-with-coal.png";
+// 3D Models
+import Minecart from "./Minecart";
+import OreTile from './OreTile';
 
 export const metadata = {
   publishDate: '2024-03-23T00:00:00Z',
@@ -9,8 +23,81 @@ export const metadata = {
   categories: ["maker", "all"],
 };
 
-## Overview
- 
+The Janurary period at MIT is called IAP (Independent Activities Period) and is a time for students to explore new things. For IAP 2024, with [Alayah Hines](https://www.linkedin.com/in/alayah-hines/), I explored low temperature metal casting. We decided to make a custom Settlers of Catan board. The plan was to design all the pieces in Fusion 360, 3D print them, make a silicone mold, and then cast the pieces in metal.
+
+We're still working on finishing the metal casting part, but we had access to a few Bambu X1 Carbon 3D printers which can print in multiple colors and thought it be cool to show off a multi-color 3D printed board.
+
+## Design Goals
+
+There were a lot of pieces to design
+- 5 resource tiles (wood, brick, wheat, sheep, and ore) and a desert tile
+- Cities, settlements, and roads for 4 players
+- A robber
+- A number of ports
+- A frame to hold everything together
+- A largest army trophy
+- A longest road trophy
+
+Since we planned to cast everything out of metals, we couldn't differentiate between the players by color. Instead, we decided to give each player a theme:
+
+- Player 1: Space Penguins 
+- Player 2: Rainbow Unicorns
+- Player 3: Fire Dragons
+- Player 4: Cloud Pigs
+
+Alayah is a CAD wizard, so most of the cool pieces were designed by her but I did a few which I'll highlight below:
+
+## Ore tile 
+
+I wanted the Ore Tile to be a mountain with a crater at the top for the number token. Then I added a train track around the mountain that a minecart could run on.
+
+### Desinging the Mountain
+
+To get the mountain aesthestic I first made a rough shape in Fusion360 and then exported it to [SculptGL](https://stephaneginier.com/sculptgl/) - An online sculpting tool. The advantage of SculptGL is that you pull, press, inflate, and smooth the mesh like you would clay unlike Fusion360 which expects more specific dimensioning.  
+
+<SideBySide 
+  left={<ProjectImage src={mountainBase} alt="Mountain Base" />}
+  right={<ProjectImage src={mountainTextured} alt="Textured Mountain Base" />}
+/>
+
+Next up I rescaled the mountain to fit the board, cut out the top for the crater, and cut out a path for the minecart
+
+<ProjectImage src={mountainWithCutouts} alt="Mountain with crater and path" />
+
+Then I wanted to add tracks. This was the trickest part. First I used the **Pipe** tool in Fusion360 to create a pipe around the path. Then I drew skeched the two train tracks and **sweeped** them along the pipe.
+
+<ProjectImage src={mountainWithTracks} alt="Tracks swept along path" />
+
+To get the bars between the tracks, I first extruded one from my track sketch. Then I offset all the faces and patterned it on a path around the track. I had to offset the faces as since the path rotates so does the bar and I wanted a portion of it to remain perpendicular to the track.
+
+<ProjectImage src={mountainWithPatternedBarsOffset} alt="Blocks patterned around train tracks" />
+
+Finally, to trim the bars to the dimension I **swept** my original track sketch along the path and intersected it with the patterned bars.
+
+<ProjectImage src={mountainWithBars} alt="Mountain with track bars" />
+
+### Designing the minecart
+
+I didn't do anything very fancy for the minecart. I just sketched the various parts and extruded them.
+
+For the gems I lofted between different polygons, converted the body to a mesh, and then remeshed and reduced the faces to get a more gem-like shape.
+
+<ModelViewer cameraPosition={[-6,6,10]} alt="Minecart">
+  <Minecart position={[0,0,0]} />
+</ModelViewer>
+
+I also reused the cart to have a minecart filled with coal
+
+<ProjectImage src={minecartWithCoal} alt="Minecart with coal" />
+
+### Bringing it all together
+
+Finally, I combined the mountain and minecart and added some gems to the mountain side:
+
+<ModelViewer cameraPosition={[0, 75, 75]} intensity={5} alt="Minecart">
+  <OreTile position={[0,0,0]} />
+</ModelViewer>
+
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
 }

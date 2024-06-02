@@ -1,5 +1,16 @@
 import thumbnail from "./thumbnail.jpg";
 import ProjectLayout from "@/components/ProjectLayout";
+import SideBySide from "@/components/SideBySide";
+import ModelViewer from "@/components/ModelViewer";
+import ProjectImage from "@/components/ProjectImage";
+// Images
+import PhotoInterrupters from "./photointerrupters.jpg";
+import PhotoInterrupterSchematic from "./photointerrupter-schematic.png";
+import TFTScreenSchematic from "./tft-screen-schematic.png";
+import SpeakerSchematic from "./speaker-schematic.png";
+import FullSchematic from "./full-schematic.png";
+// 3D Models
+import Connect4Robot from './Connect4Robot';
 
 export const metadata = {
   publishDate: '2024-05-11T00:00:00Z',
@@ -9,8 +20,96 @@ export const metadata = {
   categories: ["maker", "all", "robots", "highlights", "electronics"],
 };
 
-## Overview
- 
+In Spring 2024, I took 6.115 (Microcomputer Project Laboratory) at MIT. It takes a deep dive into embedded systems. Over four labs we built circuits and wrote code to
+
+- Find the resonant frequency of an fluroscent light and strike it
+- Display a laser light show
+- Control a robot arm
+- Reconstruct a 3D object from 2D images
+
+All of which was done on a 8-bit [Intel 8051](https://en.wikipedia.org/wiki/MCS-51) microcontroller which we programmed in assembly.
+
+For the last month of the class we had a final project. The only critera is that it has to use the [Cypress PSoC 5LP](https://www.infineon.com/cms/en/product/microcontroller/32-bit-psoc-arm-cortex-microcontroller/32-bit-psoc-5-lp-arm-cortex-m3/). 
+
+I decided to build a robot that could play Connect 4 on a physical board for a few reasons
+
+- I love building things that interact with the physical world
+- I wanted to explore the algorithms behind a game-playing AI
+- **Most importantly**, I suck at Connect 4 and wanted to build a robot that could beat my friends in my place
+
+Below I describe the design and implementation of the robot but if you want to see it in action, here's two videos:
+
+<iframe className="m-auto pb-4" width="560" height="315" src="https://www.youtube.com/embed/X0XXUfkOlMY?si=PBQl1yqKR_Zg6yaH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe className="m-auto pb-4" width="560" height="315" src="https://www.youtube.com/embed/JORZFqTXGA4?si=DMwjJiMhEpfSM4cQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## Design Goals
+
+The robot had to meet the following requirements:
+- **Play Connect 4**: The robot should be able to play Connect 4 on a physical board
+- **Simple mechanical design**: The robot should be easy to build and maintain
+- **Fast**: The robot should be able to play a game in a reasonable amount of time
+
+## Mechanical Design
+
+At the start, I was most unsure about how the actuate the robot. I considered a few options:
+
+1. I could have seven different hoppers – one above each column:
+- But this would require seven servos and was IMO excessive.
+2. One hopper attached to a timing belt so it could be positioned with a stepper?
+- With stepper motors, I'd have to home it and then keep track of its position.
+
+Eventually, I settled on a design with a fixed hopper and a plane mounted to a servo that would cover all columns up to the one I wanted to place a game piece in:
+
+With this decided, I created a CAD model of the robot in Fusion 360. I made the thickness of all the extruded pieces parametric so I could easily adjust them before laser cutting and used finger-joints to allow for easy assembly.
+
+<ModelViewer cameraPosition={[3,5,20]} alt="Connect-4 Robot" intensity={5}>
+  <Connect4Robot position={[-3,0,0]} />
+</ModelViewer>
+
+### The Gotchas
+
+It took a few iterations to get the design right. Here are some of the issues I ran into:
+
+1. **Aryclic vs Plywood:** Initally I wanted to use acrylic but it was too brittle and would crack when I tried attach the pieces. I switched to plywood which was much easier to work with.
+
+2. **Ensuring pieces fell into the right place:** I had to experiment with the angle of the plane so the pieces would roll but not so fast that they'd miss the column they were supposed to go in. Additionally, I added a lip after each hole in the plane to stop the pieces from rolling further.
+
+3. **Game pieces would get stuck on plane:** I had to add tape to the front and back plane to reduce friction. Additionally, I made the plane out of aryclic so that it was more slippery.
+
+All in all, I went through 5 iterations of the design before I was happy with it.
+
+## Electrical Design
+
+### Detecting Game Pieces
+
+I used seven [RPR-220](https://www.digikey.com/en/products/detail/rohm-semiconductor/RPR-220/638554) reflective photosensors to detect when a game piece had fallen into a column. These are a single package with an LED and phototransistor. I placed them at the top of each column. I used copper-tape to ground both ground legs and connected the signal legs to the PSoC. 
+
+<ProjectImage src={PhotoInterrupters} alt="Photointerrupters on back of robot with copper tape" />
+
+The current through the phototransistor varies with the amount of light reflected back. The datasheet specifies that at 6mm the current is 100% and it drops off when a piece falls in front. Therefore I used a pull-up resistor such that when a piece falls down the current drops and the voltage goes high. Since I used red and yellow game pieces the current never went to 0% so I adjusted my resistor value until the PSoC read a high voltage when a piece was in front of the sensor (around 1.25V).
+
+<ProjectImage src={PhotoInterrupterSchematic} alt="Schematic of photointerrupters and PSoC 5LP" />
+
+### Displaying the Game Board 
+
+I used a [HiLetgo ILI9341 TFT Screen](https://www.amazon.com/dp/B073R7BH1B?psc=1&ref=ppx_yo2ov_dt_b_product_details). It is a 2.8" touch screen with an SD card reader. Additionally, PSoC supports the emWin library which makes it relatively easy to draw shapes and text on the screen.
+
+<ProjectImage src={TFTScreenSchematic} alt="Schematic of TFT Screen" />
+
+### Playing sound effects
+
+I used a 8-ohm speaker along with a LM386 amplifier to play sound effects. As I only wanted to play tones I didn't need to implement any filters. 
+
+<ProjectImage src={SpeakerSchematic} alt="Speaker schematic" />
+
+### Acutating the robot 
+
+Finally to actuate the robot I used two servos. One to move the plane and the other to drop the game pieces.
+
+<ProjectImage src={FullSchematic} alt="Full robot schematic" />
+
+
+
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
 }
