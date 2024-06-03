@@ -9,6 +9,10 @@ import PhotoInterrupterSchematic from "./photointerrupter-schematic.png";
 import TFTScreenSchematic from "./tft-screen-schematic.png";
 import SpeakerSchematic from "./speaker-schematic.png";
 import FullSchematic from "./full-schematic.png";
+import SoftwareFlowchart from './software-flowchart.png';
+import PSoCHardware from './psoc-hardware.png';
+import SettingsScreen from './settings-screen.jpg';
+import ScreenGameplay from './screen-gameplay.jpg';
 // 3D Models
 import Connect4Robot from './Connect4Robot';
 
@@ -102,13 +106,45 @@ I used a 8-ohm speaker along with a LM386 amplifier to play sound effects. As I 
 
 <ProjectImage src={SpeakerSchematic} alt="Speaker schematic" />
 
-### Acutating the robot 
+### Actuating the robot
 
 Finally to actuate the robot I used two servos. One to move the plane and the other to drop the game pieces.
 
 <ProjectImage src={FullSchematic} alt="Full robot schematic" />
 
+## Software Design
 
+My high level software design was:
+
+<ProjectImage src={SoftwareFlowchart} alt="Software flowchart" />
+
+The full code can be seen on [Github](https://github.com/r-bt/Connect4-PSOC)
+
+All the code was written in C. I tried dividing the code into modules to make it easier to debug and test. Here are the modules I used:
+
+### TFT Screen
+
+I used the emWin library to draw the game board and game pieces on the screen. I also display a settings screen where the user can select: the difficulty level, who goes first, and whether they want to play on the robot or the screen.
+
+<ProjectImage src={SettingsScreen} alt="Settings displayed on TFT Screen" />
+
+There are two modes: screen play and robot play. In screen play the user uses the touchscreen to select which column to drop a piece in. During both modes the robot displays taunts to the user. I used the emFile library to read taunts from a text file on a SD card. 
+
+<ProjectImage src={ScreenGameplay} alt="A game of Connect-4 on the TFT screen" />
+
+## PSOC Hardware
+
+One of the major draws to the PSoC is it's programmable hardware. The PSoC comes with a bunch of blocks you can instantiate and connect to each other to make DACs, ADCs, PWMs, etc. I used the following blocks:
+
+<ProjectImage src={PSoCHardware} alt="PSoC Hardware" />
+
+1. **SPI**: To communicate with the TFT screen
+2. **Digital Pins**: To communicate with the TFT touchscreen module
+3. **PWM**: To control the servos
+4. **USBUART**: To send debug information to my computer
+5. **emFile**: To read files from the SD card
+6. **Digital Pins + Interrupt**: To read the photointerrupters
+7. **VDAC and DMA**: To play sound effects
 
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
