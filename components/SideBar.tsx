@@ -46,7 +46,16 @@ export default function SideBar() {
       <div>
         <ul className="lg:text-right leading-8 text-md">
           <NavigationLink href="/">projects</NavigationLink>
-          <NavigationLink href="/resume">resume</NavigationLink>
+          <li className="inline lg:block pr-4 lg:pr-0">
+            <a
+              href="/resume.pdf"
+              className={
+                "text-slate-300 hover:text-slate-400 focus:text-slate-500"
+              }
+            >
+              resume
+            </a>
+          </li>
           <NavigationLink href="/classes">classes</NavigationLink>
           <NavigationLink href="/ideas">ideas</NavigationLink>
         </ul>
