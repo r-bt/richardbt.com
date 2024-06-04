@@ -13,6 +13,8 @@ import SoftwareFlowchart from './software-flowchart.png';
 import PSoCHardware from './psoc-hardware.png';
 import SettingsScreen from './settings-screen.jpg';
 import ScreenGameplay from './screen-gameplay.jpg';
+import BitboardRepresentation from './bitboard-representation.png';
+import PositionValues from './position-values.png';
 // 3D Models
 import Connect4Robot from './Connect4Robot';
 
@@ -132,6 +134,38 @@ There are two modes: screen play and robot play. In screen play the user uses th
 
 <ProjectImage src={ScreenGameplay} alt="A game of Connect-4 on the TFT screen" />
 
+### Connect4 Game and AI
+
+I implemented Connect4 using a bitboard representation as described [here](https://github.com/denkspuren/BitboardC4/blob/master/BitboardDesign.md). For each player I stored a 64-bit number where a 1 represented their game piece and a 0 represented an empty space or the other player's piece. 
+
+The benefit of this representation is that I can efficently check for wins by using bitwise operations. 
+
+<ProjectImage src={BitboardRepresentation} alt="Connect-4 bitboard representation" /> 
+
+I implemented the AI using a [minimax algorithm](https://en.wikipedia.org/wiki/Minimax). The idea is that the AI has a **heuristic** function that evaluates a given board state. I then simulate all possible moves up to a certain depth and choose the move that maximizes the heuristic for the AI and minimizes it for the player.
+
+I allowed the user to choose three difficulty levels: 
+1. **Easy**: The AI only looks one move ahead
+2. **Medium**: The AI looks five moves ahead
+3. **Hard**: The AI looks 10 moves ahead
+
+However, at 10 moves ahead the AI would need to evaluate 7^10 = 282,475,249 moves which was too slow. Therefore, I implemented two optimizations:
+
+1. **Negamax**: I simplified the minimax algorithm by using the zero-sum property of the game. The AI player's score is the negative of the human player's score. Therefore, I only need to implement the max part of the algorithm.
+2. **Alpha-Beta Pruning**: I used alpha-beta pruning to reduce the number of nodes I needed to evaluate. The idea is that I maintain two values, alpha (the best guaranteed score for the maximizer) and beta (the best guaranteed score for the minimizer). I can then prune all nodes that are less than alpha or greater than beta.
+
+For the heuristic function, I gave each position a value for example the lowest row on the center column is the best position to play in. Then I calculate the score for each player by summing the values of their pieces and add extra points if they have three-in-a-row. 
+
+<ProjectImage src={PositionValues} alt="Values given to Connect-4 positions" />
+
+### Controlling the robot
+
+First, to detect the pieces I had an interrupt triggered by the photointerrupters. I had to debounce the signal as the controller was fast enough to detect the piece multiple times as it fell.
+
+Then, I manually found the right PWM values to move the plane and drop the pieces. I had to account for the slight wiggle of the servo.
+
+Occassionally, the piece would fall into the wrong column. I had the robot always detect where it's piece actually fell and roll with it if it was in the wrong column. This isn't a real fix but I think it adds some randomness which makes the game more fun since you can occassionally actually win.
+
 ## PSOC Hardware
 
 One of the major draws to the PSoC is it's programmable hardware. The PSoC comes with a bunch of blocks you can instantiate and connect to each other to make DACs, ADCs, PWMs, etc. I used the following blocks:
@@ -145,6 +179,10 @@ One of the major draws to the PSoC is it's programmable hardware. The PSoC comes
 5. **emFile**: To read files from the SD card
 6. **Digital Pins + Interrupt**: To read the photointerrupters
 7. **VDAC and DMA**: To play sound effects
+
+## Conclusion
+
+My Connect-4 Robot was a fun project to build. I learned a lot about embedded systems, game playing AI, and mechanical design. I also got to play a lot of Connect-4 but I can't say I got any better at it. There was a lot of work in designing, building, and debugging the robot but it was all worth it to see it in action. Above is only a high-level overview of the project. If you're interested in more details, feel free to reach out to me or look through the code.
 
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
