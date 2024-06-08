@@ -54,6 +54,12 @@ export default function Classes() {
         <Class number="ES.802" title="Physics II" />
         <Class number="ES.1802" title="Multi-variable Calculus" />
       </Semester>
+      <Semester title="Fall 2021">
+        <Class number="ES.801" title="Physics I" />
+        <Class number="ES.1801" title="Calculus" />
+        <Class number="ES.5111" title="Principles of Chemical Science" />
+        <Class number="24.02" title="Moral Problems and the Good Life" />
+      </Semester>
     </>
   );
 }

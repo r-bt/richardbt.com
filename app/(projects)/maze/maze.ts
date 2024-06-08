@@ -76,8 +76,15 @@ export default class CoordinateSet {
 }
 
 const CHAR_SPACING = 2;
+const LINE_SPACING = 4;
 const LEFT_RIGHT_MARGIN = 5;
 const TOP_BOTTOM_MARGIN = 5;
+
+interface Line {
+  width: number;
+  height: number;
+  text: string;
+}
 
 /**
  * Generates a maze using Randomized Prim's Algorithm. If a text is provided, the maze will be generated with that text as the solution
@@ -107,42 +114,85 @@ export function createMaze(
   let mazeWidth = width || 0,
     mazeHeight = height || 0;
 
-  let textWidth = 0,
-    textHeight = 0;
+  let textHeight = 0;
 
-  let wordWidths = [0];
-  let wordHeights = [0];
+  let lines: Line[] = [
+    {
+      width: 0,
+      height: 0,
+      text: "",
+    },
+  ];
 
   if (text && text.length > 0) {
+    // Get the width and height of each word
     let wordIndex = 0;
 
+    let wordWidths = [0];
+    let wordHeights = [0];
+    let words = text.split(" ");
+
     // Calculate the width and height of all words
-    for (const c of text) {
-      const letter = letters[c];
+    for (let i = 0; i < words.length; i++) {
+      for (const c of words[i]) {
+        const letter = letters[c];
 
-      wordWidths[wordIndex] += letter.width + CHAR_SPACING;
-      wordHeights[wordIndex] = Math.max(wordHeights[wordIndex], letter.height);
+        wordWidths[wordIndex] += letter.width + CHAR_SPACING;
+        wordHeights[wordIndex] = Math.max(
+          wordHeights[wordIndex],
+          letter.height
+        );
+      }
 
-      if (multiline && c == " ") {
-        wordWidths[wordIndex] -= letter.width + CHAR_SPACING; // Don't include the space
-
+      if (multiline && i < words.length - 1) {
+        wordIndex++;
         wordWidths.push(0);
         wordHeights.push(0);
-        wordIndex++;
       }
     }
 
-    textWidth = Math.max(...wordWidths);
+    // Use word widths to bound the width of the maze
+    let maxWordWidth = Math.max(...wordWidths);
+    mazeWidth = Math.max(mazeWidth, maxWordWidth);
 
-    // @TODO - This assumes each word always has it's own line
-    textHeight = wordHeights.reduce((a, b) => a + b + CHAR_SPACING, 0); // Calculate the total height taken up by the text
-
-    mazeWidth = Math.max(mazeWidth, textWidth);
-    mazeHeight = Math.max(mazeHeight, textHeight);
-
-    if (mazeWidth - textWidth < LEFT_RIGHT_MARGIN * 2) {
-      mazeWidth += LEFT_RIGHT_MARGIN * 2 - (mazeWidth - textWidth);
+    if (mazeWidth - maxWordWidth < LEFT_RIGHT_MARGIN * 2) {
+      mazeWidth += LEFT_RIGHT_MARGIN * 2 - (mazeWidth - maxWordWidth);
     }
+
+    // Finally, we need to assign words to lines
+    let lineIndex = 0;
+    for (let i = 0; i < wordWidths.length; i++) {
+      let wordWidth = wordWidths[i];
+      let wordHeight = wordHeights[i];
+
+      if (
+        lines[lineIndex].width + wordWidth >
+        mazeWidth - LEFT_RIGHT_MARGIN * 2
+      ) {
+        lineIndex++;
+        lines.push({
+          width: 0,
+          height: 0,
+          text: "",
+        });
+      }
+
+      // Already a word on the line
+      if (lines[lineIndex].width != 0) {
+        lines[lineIndex].text += " ";
+        lines[lineIndex].width += CHAR_SPACING + letters[" "].width; // Have to account for the space
+      }
+
+      lines[lineIndex].width += wordWidth;
+      lines[lineIndex].height = Math.max(lines[lineIndex].height, wordHeight);
+      lines[lineIndex].text += words[i];
+    }
+
+    // let textWidth = Math.max(...lines.map((line) => line.width));
+    textHeight = lines.reduce((a, b) => a + b.height + LINE_SPACING, 0);
+
+    // Bound the height of the maze
+    mazeHeight = Math.max(mazeHeight, textHeight);
 
     if (mazeHeight - textHeight < TOP_BOTTOM_MARGIN * 2) {
       mazeHeight += TOP_BOTTOM_MARGIN * 2 - (mazeHeight - textHeight);
@@ -283,14 +333,15 @@ export function createMaze(
    *
    * @param start The starting cell
    * @param end The ending cell
-   * @param can_move_back Whether we can move back in the x-direction. Defaults to false to avoid interference with later connections on the same line
-   *                      If it is true we still don't want to interfere, so we only move down if we've left where the text should start.
+   * @param is_new_line Normally, we can't move back to avoid interference with later connections on the same line.
+   * However, if we are moving to a new line, we need to move back
+   * @param top_left The top left coordinate of the text
    */
   const find_empty_path = (
     start: [number, number],
     end: [number, number],
-    can_move_back = false,
-    lower_right_y?: number
+    is_new_line = false,
+    top_left?: [number, number]
   ) => {
     const stack = [start];
     const visited = new CoordinateSet();
@@ -301,6 +352,8 @@ export function createMaze(
     } = {};
     parents[start[0]] = {};
     parents[start[0]][start[1]] = null;
+
+    let reached_side = false; // If we're going to a new line we need to go past the end point before we can go down
 
     while (stack.length > 0) {
       const cell = stack.shift();
@@ -328,15 +381,24 @@ export function createMaze(
 
       // We never want to move back (or else it interferes with later connections) unless we are moving to a new line
       // i.e. since the cell we're considering is in front of the end position, we'd then have to move back to get to the end
-      if (cell[0] > end[0] && !can_move_back) {
+      if (cell[0] > end[0] && !is_new_line) {
         continue;
       }
 
-      // If we are moving back, we don't want to move through the text
-      if (can_move_back && cell[0] > end[0] && lower_right_y != undefined) {
-        if (cell[1] > lower_right_y + CHAR_SPACING) {
+      // If we are moving to a new line and the cell is in front of the end position, we want to avoid interfering with the text
+      if (
+        is_new_line &&
+        cell[0] > end[0] &&
+        top_left != undefined &&
+        !reached_side
+      ) {
+        if (cell[1] >= top_left[1]) {
           continue;
         }
+      }
+
+      if (top_left && cell[0] < top_left[0] && is_new_line) {
+        reached_side = true;
       }
 
       // End point can be in the maze so we need to get all neighbours
@@ -360,8 +422,13 @@ export function createMaze(
    *
    * @param start The starting cell
    * @param end The ending cell
+   * @param y_constain Whether we should go below the end point
    */
-  const find_windy_path = (start: [number, number], end: [number, number]) => {
+  const find_windy_path = (
+    start: [number, number],
+    end: [number, number],
+    y_constain = false
+  ) => {
     const stack = [start];
     const visited = new CoordinateSet();
     visited.add(...start);
@@ -401,6 +468,12 @@ export function createMaze(
         continue;
       }
 
+      if (y_constain) {
+        if (Math.abs(cell[1] - start[1]) > Math.abs(end[1] - start[1])) {
+          continue;
+        }
+      }
+
       // End point can be in the maze so we need to get all neighbours
       const all_neighbours = get_adjacent_cells(cell[0], cell[1], undefined);
 
@@ -427,79 +500,66 @@ export function createMaze(
   const add_preset_solution = (solution: string) => {
     // Want to align text to be in the center
     const inital_offset = [
-      Math.floor((mazeWidth - wordWidths[0]) / 2),
+      Math.floor((mazeWidth - lines[0].width) / 2),
       Math.floor((mazeHeight - textHeight) / 2),
     ];
 
-    let letter_offset = inital_offset;
+    console.log({ inital_offset, mazeWidth, lines });
+
+    let letter_offset = [0, 0];
+    letter_offset[1] = inital_offset[1];
 
     // Store the previous ending point
     let previous_ending_point;
     let previous_offset_height;
 
-    let word_index = 0;
-    for (const c of solution) {
-      if (multiline && c == " ") {
-        word_index++;
-        /**
-         * Check if we need to move to the next line
-         **/
-        if (
-          letter_offset[0] +
-            letters[c].width +
-            CHAR_SPACING +
-            wordWidths[word_index] >
-          mazeWidth - LEFT_RIGHT_MARGIN
-        ) {
-          console.log("Moving to the next line");
-          letter_offset = [
-            Math.floor((mazeWidth - wordWidths[word_index]) / 2),
-            letter_offset[1] + wordHeights[word_index - 1] + CHAR_SPACING,
-          ];
-          continue; // moving to the next line so we don't need this space
+    for (const line of lines) {
+      letter_offset[0] = Math.floor((mazeWidth - line.width) / 2);
+
+      for (const c of line.text) {
+        const points = letters[c].path.map(([x, y]): [number, number] => {
+          return [x + letter_offset[0], y + letter_offset[1]];
+        });
+
+        allocate_path_from_points(points);
+
+        if (c != " ") {
+          letterPoints = letterPoints.concat(points);
         }
-      }
 
-      const points = letters[c].path.map(([x, y]): [number, number] => {
-        return [x + letter_offset[0], y + letter_offset[1]];
-      });
-
-      allocate_path_from_points(points);
-
-      if (c != " ") {
-        letterPoints = letterPoints.concat(points);
-      }
-
-      // Connect the start of the this character with the end of the previous
-      if (previous_ending_point != undefined) {
-        const path = find_empty_path(
-          previous_ending_point,
-          points[0],
-          letter_offset[1] != previous_offset_height,
-          letter_offset[1] + wordHeights[word_index]
-        );
-
-        if (path != undefined) {
-          allocate_path_from_points(path);
-          extraPathPoints = extraPathPoints.concat(path);
-        } else {
-          console.log({ previous_ending_point, new: points[0] });
-          console.error(
-            "No path from previous ending point to start of letter for ",
-            c
+        // Connect the start of the this character with the end of the previous
+        if (previous_ending_point != undefined) {
+          const path = find_empty_path(
+            previous_ending_point,
+            points[0],
+            letter_offset[1] != previous_offset_height,
+            [letter_offset[0], letter_offset[1]]
           );
+
+          if (path != undefined) {
+            allocate_path_from_points(path);
+            extraPathPoints = extraPathPoints.concat(path);
+          } else {
+            console.log({ previous_ending_point, new: points[0] });
+            console.error(
+              "No path from previous ending point to start of letter for ",
+              c
+            );
+          }
         }
+
+        // Store the ending point
+        previous_ending_point = points[points.length - 1];
+        previous_offset_height = letter_offset[1];
+
+        // Update the offset
+        letter_offset = [
+          letter_offset[0] + letters[c].width + CHAR_SPACING,
+          letter_offset[1],
+        ];
       }
 
-      // Store the ending point
-      previous_ending_point = points[points.length - 1];
-      previous_offset_height = letter_offset[1];
-
-      // Update the offset
-      letter_offset = [
-        letter_offset[0] + letters[c].width + CHAR_SPACING,
-        letter_offset[1],
-      ];
+      letter_offset[1] += line.height + LINE_SPACING;
     }
 
     // Connect the start of the first character with the start of the maze
@@ -508,7 +568,7 @@ export function createMaze(
       inital_offset[1] + letters[solution[0]]["path"][0][1],
     ];
 
-    let connecting_path = find_windy_path([0, 0], start);
+    let connecting_path = find_windy_path([0, 0], start, true);
 
     if (connecting_path != undefined) {
       allocate_path_from_points(connecting_path);
@@ -523,7 +583,8 @@ export function createMaze(
 
     connecting_path = find_windy_path(
       [mazeWidth - 1, mazeHeight - 1],
-      previous_ending_point
+      previous_ending_point,
+      true
     );
 
     if (connecting_path != undefined) {
