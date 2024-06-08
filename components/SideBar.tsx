@@ -30,7 +30,7 @@ export default function SideBar() {
       </div>
       <div className="pt-6">
         <ul>
-          <ListElement Icon={MdConstruction} text="Connect-4 Robot" />
+          <ListElement Icon={MdConstruction} text="Text Maze Generator" />
           <ListElement Icon={IoLocationSharp} text="MIT, Cambridge" />
           <ListElement Icon={IoHomeSharp} text="Dublin, Ireland" />
         </ul>

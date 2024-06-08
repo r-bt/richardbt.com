@@ -6,11 +6,34 @@ export const metadata = {
   thumbnail,
   title: "Prepsheets",
   description: "A SaaS platform for managing recipes and ingredient lists for hospitality businesses.",
-  categories: ["software", "all"],
+  categories: ["software", "all", "highlights"],
 };
 
-## Overview
+When Covid-19 hit Ireland my parents were running a catering business and a few cafés. Like many others, the total intermittent closures them hard.
+They were looking at ways to streamline their business and reduce costs.
+
+For all hospitality businesses, the cost of ingredients is a significant portion of their expenses. My parents were spending hours each week creating ingredient lists, reviewing price changes (which were happening all the time) and updating their recipes. They were using a combination of spreadsheets and paper to manage this process.
+
+They asked me if I could build a system that would help them manage this process. I agreed and started working on Prepsheets. I built the first MVP over the summer of 2020, and within six months of using it they had saved over **€100,000** in ingredient costs. 
+
+My parents showed it to some of their friends in the industry and they wanted to use it too. Over my gap year, I continued to develop the Prepsheets platform while my parents sold it to other businesses. 
+
+I stepped away from the project in August 2021 to focus on my studies but my parents continue to run the business. They now have a team of 4 people working on it now and have over 30 businesses using the platform.
+
+You can see the website [here](https://prepsheets.com/).
+
+## Technical details
+
+As an existing business, I can't share the codebase but I can share some technical details. The frontend is built using React and Typescript and the backend is built on Firebase. 
+
+The platform has a few key features:
+- **Recipe management**: Users can create recipes and add ingredients to them. They can also add instructions and images.
+- **Ingredient management**: Users can add ingredients to the platform and assign them to recipes. They can also add suppliers and prices.
+- **Cost tracking**: Users can see how much each recipe costs to make and how much each ingredient costs.
+- **Price tracking**: Users can see how the price of ingredients has changed over time.
+- **Supplier management**: The system manages a database of suppliers and the allergen and nutritional information of their products allowing users to have always up-to-date information.
  
+
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
 }
