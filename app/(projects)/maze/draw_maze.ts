@@ -1,20 +1,22 @@
-import { SVG } from "@svgdotjs/svg.js";
+import { SVG, Svg } from "@svgdotjs/svg.js";
 
 export function drawMaze(
   passages: { [key: string]: [number, number][] },
   width: number,
   height: number,
-  container: HTMLDivElement,
   letters: [number, number][],
   extraPathPoints: [number, number][],
   cell_size = 20,
   wall_thickness = 1
-) {
-  const draw = SVG().addTo(container);
-  draw.size(
-    width * cell_size + wall_thickness,
-    height * cell_size + wall_thickness
-  );
+): Svg {
+  const draw = SVG();
+
+  // Calculate the total size of the SVG content
+  const totalWidth = width * cell_size + wall_thickness;
+  const totalHeight = height * cell_size + wall_thickness;
+
+  // Set the viewBox to enable scaling
+  draw.viewbox(0, 0, totalWidth, totalHeight);
 
   const shouldDrawWall = (cell1: [number, number], cell2: [number, number]) => {
     if (passages[`${cell1[0]},${cell1[1]}`]) {
@@ -76,20 +78,62 @@ export function drawMaze(
   }
 
   if (extraPathPoints.length > 0) {
+    let endPoint = [cell_size / 2, cell_size / 2];
+
     extraPathPoints.forEach(([x, y]) => {
+      // Make sure this point is beside the previous point
+      let xPoint = x * cell_size + cell_size / 2;
+      let yPoint = y * cell_size + cell_size / 2;
+
+      if (
+        Math.abs(xPoint - endPoint[0]) > cell_size ||
+        Math.abs(yPoint - endPoint[1]) > cell_size
+      ) {
+        endPoint = [xPoint, yPoint];
+      }
+
+      if (
+        shouldDrawWall(
+          [x, y],
+          [
+            (endPoint[0] - cell_size / 2) / cell_size,
+            (endPoint[1] - cell_size / 2) / cell_size,
+          ]
+        )
+      ) {
+        endPoint = [xPoint, yPoint];
+      }
+
       draw
-        .rect(cell_size / 2, cell_size / 2)
-        .move(x * cell_size + cell_size / 4, y * cell_size + cell_size / 4)
-        .fill("green");
+        .line(endPoint[0], endPoint[1], xPoint, yPoint)
+        .stroke({ color: "green", width: 4 });
+
+      endPoint = [xPoint, yPoint];
     });
   }
 
   if (letters.length > 0) {
+    let endPoint = [cell_size / 2, cell_size / 2];
+
     letters.forEach(([x, y]) => {
+      // Make sure this point is beside the previous point
+      let xPoint = x * cell_size + cell_size / 2;
+      let yPoint = y * cell_size + cell_size / 2;
+
+      if (
+        Math.abs(xPoint - endPoint[0]) > cell_size ||
+        Math.abs(yPoint - endPoint[1]) > cell_size
+      ) {
+        endPoint = [xPoint, yPoint];
+      }
+
       draw
-        .rect(cell_size / 2, cell_size / 2)
-        .move(x * cell_size + cell_size / 4, y * cell_size + cell_size / 4)
-        .fill("red");
+        .line(endPoint[0], endPoint[1], xPoint, yPoint)
+        .stroke({ color: "red", width: 4 });
+
+      endPoint = [xPoint, yPoint];
     });
   }
+
+  return draw;
 }

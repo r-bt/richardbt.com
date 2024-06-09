@@ -79,10 +79,9 @@ const CHAR_SPACING = 2;
 const LINE_SPACING = 4;
 const LEFT_RIGHT_MARGIN = 5;
 const TOP_BOTTOM_MARGIN = 5;
-
+const CHAR_HEIGHT = 8;
 interface Line {
   width: number;
-  height: number;
   text: string;
 }
 
@@ -119,7 +118,6 @@ export function createMaze(
   let lines: Line[] = [
     {
       width: 0,
-      height: 0,
       text: "",
     },
   ];
@@ -129,25 +127,23 @@ export function createMaze(
     let wordIndex = 0;
 
     let wordWidths = [0];
-    let wordHeights = [0];
     let words = text.split(" ");
 
     // Calculate the width and height of all words
     for (let i = 0; i < words.length; i++) {
       for (const c of words[i]) {
+        if (letters[c] == undefined) {
+          continue;
+        }
+
         const letter = letters[c];
 
         wordWidths[wordIndex] += letter.width + CHAR_SPACING;
-        wordHeights[wordIndex] = Math.max(
-          wordHeights[wordIndex],
-          letter.height
-        );
       }
 
       if (multiline && i < words.length - 1) {
         wordIndex++;
         wordWidths.push(0);
-        wordHeights.push(0);
       }
     }
 
@@ -163,7 +159,6 @@ export function createMaze(
     let lineIndex = 0;
     for (let i = 0; i < wordWidths.length; i++) {
       let wordWidth = wordWidths[i];
-      let wordHeight = wordHeights[i];
 
       if (
         lines[lineIndex].width + wordWidth >
@@ -172,7 +167,6 @@ export function createMaze(
         lineIndex++;
         lines.push({
           width: 0,
-          height: 0,
           text: "",
         });
       }
@@ -184,12 +178,11 @@ export function createMaze(
       }
 
       lines[lineIndex].width += wordWidth;
-      lines[lineIndex].height = Math.max(lines[lineIndex].height, wordHeight);
       lines[lineIndex].text += words[i];
     }
 
     // let textWidth = Math.max(...lines.map((line) => line.width));
-    textHeight = lines.reduce((a, b) => a + b.height + LINE_SPACING, 0);
+    textHeight = lines.length * (CHAR_HEIGHT + LINE_SPACING);
 
     // Bound the height of the maze
     mazeHeight = Math.max(mazeHeight, textHeight);
@@ -469,7 +462,7 @@ export function createMaze(
       }
 
       if (y_constain) {
-        if (Math.abs(cell[1] - start[1]) > Math.abs(end[1] - start[1])) {
+        if (Math.abs(cell[1] - start[1]) - 1 > Math.abs(end[1] - start[1])) {
           continue;
         }
       }
@@ -517,6 +510,10 @@ export function createMaze(
       letter_offset[0] = Math.floor((mazeWidth - line.width) / 2);
 
       for (const c of line.text) {
+        if (letters[c] == undefined) {
+          continue;
+        }
+
         const points = letters[c].path.map(([x, y]): [number, number] => {
           return [x + letter_offset[0], y + letter_offset[1]];
         });
@@ -559,7 +556,7 @@ export function createMaze(
         ];
       }
 
-      letter_offset[1] += line.height + LINE_SPACING;
+      letter_offset[1] += CHAR_HEIGHT + LINE_SPACING;
     }
 
     // Connect the start of the first character with the start of the maze
@@ -569,6 +566,8 @@ export function createMaze(
     ];
 
     let connecting_path = find_windy_path([0, 0], start, true);
+
+    console.log({ start, connecting_path });
 
     if (connecting_path != undefined) {
       allocate_path_from_points(connecting_path);
