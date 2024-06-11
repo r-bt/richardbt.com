@@ -1,0 +1,23 @@
+import thumbnail from './thumbnail.svg';
+import ProjectLayout from "@/components/ProjectLayout";
+import MazeGenerator from './MazeGenerator';
+
+export const metadata = {
+    thumbnail,
+    title: "Message Maze Generator",
+    publishDate: '2022-12-05T00:00:00Z',
+    description: "A maze generator that creates a maze from a message",
+    categories: ["software", "all"],
+};
+
+For a friends birthday I 3D printed them a puzzle box that required them to solve a maze to open it. The twist was that the solution to the maze spelled out their name. I wanted to make a program that could generate these puzzle boxes for any name. The first step was to create a maze generator that could take a message and turn it into a maze.
+
+I'm still getting rid of some bugs, so if you find any phrases that don't work, please let me know!
+
+<hr className="my-8" />
+
+<MazeGenerator />
+
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}

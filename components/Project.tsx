@@ -28,7 +28,7 @@ export default function Project({
           alt={title}
           objectFit="cover"
           fill
-          className="-z-10 group-hover:blur-[3px] group-focus:blur-[3px] group-active:blur-[3px] transition ease-in-out duration-200"
+          className="-z-10 group-hover:blur-[7px] group-focus:blur-[3px] group-active:blur-[3px] transition ease-in-out duration-200"
         />
         <p className="text-white uppercase font-bold text-lg ml-4 mb-2 block relative transition ease-in-out duration-200 group-hover:-translate-y-4 translate-y-8">
           {title}

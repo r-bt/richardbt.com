@@ -333,8 +333,8 @@ export function createMaze(
   const find_empty_path = (
     start: [number, number],
     end: [number, number],
-    is_new_line = false,
-    top_left?: [number, number]
+    is_new_line = false
+    // top_left?: [number, number]
   ) => {
     const stack = [start];
     const visited = new CoordinateSet();
@@ -346,7 +346,7 @@ export function createMaze(
     parents[start[0]] = {};
     parents[start[0]][start[1]] = null;
 
-    let reached_side = false; // If we're going to a new line we need to go past the end point before we can go down
+    // let reached_side = false; // If we're going to a new line we need to go past the end point before we can go down
 
     while (stack.length > 0) {
       const cell = stack.shift();
@@ -378,21 +378,21 @@ export function createMaze(
         continue;
       }
 
-      // If we are moving to a new line and the cell is in front of the end position, we want to avoid interfering with the text
-      if (
-        is_new_line &&
-        cell[0] > end[0] &&
-        top_left != undefined &&
-        !reached_side
-      ) {
-        if (cell[1] >= top_left[1]) {
-          continue;
-        }
-      }
+      // if (
+      //   is_new_line &&
+      //   cell[0] < end[0] &&
+      //   top_left != undefined &&
+      //   !reached_side
+      // ) {
+      //   if (cell[1] >= top_left[1]) {
+      //     continue;
+      //   }
+      // }
 
-      if (top_left && cell[0] < top_left[0] && is_new_line) {
-        reached_side = true;
-      }
+      // if (top_left && cell[0] < top_left[0] && is_new_line) {
+      //   console.log("Reached side", { cell, top_left });
+      //   reached_side = true;
+      // }
 
       // End point can be in the maze so we need to get all neighbours
       const all_neighbours = get_adjacent_cells(cell[0], cell[1], undefined);
@@ -497,16 +497,16 @@ export function createMaze(
       Math.floor((mazeHeight - textHeight) / 2),
     ];
 
-    console.log({ inital_offset, mazeWidth, lines });
-
     let letter_offset = [0, 0];
     letter_offset[1] = inital_offset[1];
 
     // Store the previous ending point
-    let previous_ending_point;
-    let previous_offset_height;
+    let previous_ending_point: [number, number] | undefined;
+    let previousLine = 0;
 
-    for (const line of lines) {
+    const lineEndings: [[number, number], [number, number]][] = [];
+
+    lines.forEach((line, index) => {
       letter_offset[0] = Math.floor((mazeWidth - line.width) / 2);
 
       for (const c of line.text) {
@@ -526,28 +526,28 @@ export function createMaze(
 
         // Connect the start of the this character with the end of the previous
         if (previous_ending_point != undefined) {
-          const path = find_empty_path(
-            previous_ending_point,
-            points[0],
-            letter_offset[1] != previous_offset_height,
-            [letter_offset[0], letter_offset[1]]
-          );
-
-          if (path != undefined) {
-            allocate_path_from_points(path);
-            extraPathPoints = extraPathPoints.concat(path);
+          if (previousLine != index) {
+            lineEndings.push([previous_ending_point, points[0]]);
           } else {
-            console.log({ previous_ending_point, new: points[0] });
-            console.error(
-              "No path from previous ending point to start of letter for ",
-              c
-            );
+            let path;
+
+            path = find_empty_path(previous_ending_point, points[0]);
+
+            if (path != undefined) {
+              allocate_path_from_points(path);
+              extraPathPoints = extraPathPoints.concat(path);
+            } else {
+              console.error(
+                "No path from previous ending point to start of letter for ",
+                c
+              );
+            }
           }
         }
 
         // Store the ending point
         previous_ending_point = points[points.length - 1];
-        previous_offset_height = letter_offset[1];
+        previousLine = index;
 
         // Update the offset
         letter_offset = [
@@ -557,7 +557,7 @@ export function createMaze(
       }
 
       letter_offset[1] += CHAR_HEIGHT + LINE_SPACING;
-    }
+    });
 
     // Connect the start of the first character with the start of the maze
     const start: [number, number] = [
@@ -567,14 +567,14 @@ export function createMaze(
 
     let connecting_path = find_windy_path([0, 0], start, true);
 
-    console.log({ start, connecting_path });
-
     if (connecting_path != undefined) {
       allocate_path_from_points(connecting_path);
       extraPathPoints = extraPathPoints.concat(connecting_path);
     } else {
       console.error("No windy path from start to first letter");
     }
+
+    // Connect the end of the last character with the end of the maze
 
     if (!previous_ending_point) {
       throw new Error("No previous ending point");
@@ -590,6 +590,18 @@ export function createMaze(
       allocate_path_from_points(connecting_path);
       extraPathPoints = extraPathPoints.concat(connecting_path);
     }
+
+    // Connect the end of all the lines with the end of the maze
+    lineEndings.reverse().forEach(([start, end]) => {
+      let path = find_empty_path(start, end, true);
+
+      if (path != undefined) {
+        allocate_path_from_points(path);
+        extraPathPoints = extraPathPoints.concat(path);
+      } else {
+        console.error("No path from line ending to next line start");
+      }
+    });
   };
 
   /**

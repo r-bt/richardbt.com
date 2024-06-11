@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,9 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [
@@ -34,9 +28,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "build/types/**/*.ts",
-    "out/types/**/*.ts"
-, "app/ideas/page.mdx"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "out/types/**/*.ts",
+    "app/ideas/page.mdx",
+    "app/(projects)/projects/maze-generator/page.mdx"
+  ],
+  "exclude": ["node_modules"]
 }
