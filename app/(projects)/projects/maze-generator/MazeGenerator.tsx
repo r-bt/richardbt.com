@@ -130,7 +130,7 @@ export default function MazeGenerator() {
       </div>
       <div ref={mazeContainer} className="pt-4"></div>
       {generated && (
-        <div className="pt-4 flex justify-between items-center">
+        <div className="pt-4 flex justify-between items-center flex-wrap">
           <div>
             <Button href={hrefs.solved} fileName={"solved_maze.svg"}>
               Download Solved
