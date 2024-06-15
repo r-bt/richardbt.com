@@ -106,7 +106,7 @@ export default function MazeGenerator() {
         <div className="pt-2 flex flex-wrap">
           <div className="mr-4 mb-4">
             <label className="block text-sm font-medium text-gray-700">
-              Width:
+              Min Width:
             </label>
             <input
               value={mazeAttributes.width}
@@ -117,7 +117,7 @@ export default function MazeGenerator() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Height:
+              Min Height:
             </label>
             <input
               value={mazeAttributes.height}
