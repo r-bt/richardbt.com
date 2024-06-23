@@ -9,7 +9,6 @@ export default function CommentBox() {
   // Add comments script with Utterances.
   // Note rendered twice because of strict mode in development
   useEffect(() => {
-    console.log("Use effect ran!");
     const commentScript = document.createElement("script");
     // Optional: It is possible to use light/dark themes in the comment box
     const theme = "github-light";

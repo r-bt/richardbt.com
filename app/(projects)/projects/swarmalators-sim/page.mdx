@@ -1,0 +1,17 @@
+import thumbnail from "./thumbnail.png";
+import ProjectLayout from "@/components/ProjectLayout";
+import Swarmalators from "./Swarmalators";
+
+export const metadata = {
+  publishDate: '2024-06-22T00:00:00Z',
+  thumbnail,
+  title: "Swarmalators Simulation",
+  description: "Collection of patterns from the swarmalators model",
+  categories: ["software", "all", "highlights"],
+};
+
+<Swarmalators />
+
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}
