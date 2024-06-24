@@ -125,11 +125,54 @@ export default function Swarmalators() {
 
   return (
     <div>
-      <Canvas
-        draw={draw}
-        establishContext={establishContext}
-        establishSize={establishSize}
-      />
+      <div className="border-2">
+        <Canvas
+          draw={draw}
+          establishContext={establishContext}
+          establishSize={establishSize}
+        />
+      </div>
+      <div className="pt-4">
+        <div className="pb-2">
+          <label htmlFor="default-range" className="">
+            Agents: {swarmalatorSettings.agents}
+          </label>
+          <input
+            id="default-range"
+            type="range"
+            value={swarmalatorSettings.agents}
+            onChange={(e) =>
+              setSwarmalatorSettings({
+                ...swarmalatorSettings,
+                agents: parseInt(e.target.value),
+              })
+            }
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            min={1}
+            max={1000}
+          />
+        </div>
+        <div className="pb-2">
+          <label htmlFor="default-range" className="">
+            dT: {swarmalatorSettings.dT}
+          </label>
+          <input
+            id="default-range"
+            type="range"
+            value={swarmalatorSettings.dT}
+            onChange={(e) =>
+              setSwarmalatorSettings({
+                ...swarmalatorSettings,
+                dT: parseFloat(e.target.value),
+              })
+            }
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            min={0.005}
+            max={0.1}
+            step={0.005}
+          />
+        </div>
+      </div>
     </div>
   );
 }

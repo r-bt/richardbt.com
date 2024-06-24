@@ -29,8 +29,8 @@ export default function Canvas(props: {
       if (canvas.width !== width || canvas.height !== height) {
         const { devicePixelRatio: ratio = 1 } = window;
 
-        canvas.width = width * ratio;
-        canvas.height = height * ratio;
+        canvas.width = Math.max(width, 764) * ratio;
+        canvas.height = Math.max(width, 764) * ratio;
 
         if (establishSize) {
           establishSize(canvas.width, canvas.height);
