@@ -136,7 +136,7 @@ export default function Swarmalators() {
         swarmalator.set_chiral(undefined);
       }
     }
-  }, [swarmalatorSettings.chiral, swarmalator, swarmalatorSettings.agents]);
+  }, [swarmalatorSettings.chiral, swarmalator]);
 
   useEffect(() => {
     if (swarmalator) {
@@ -147,11 +147,7 @@ export default function Swarmalators() {
         )
       );
     }
-  }, [
-    swarmalator,
-    swarmalatorSettings.agents,
-    swarmalatorSettings.natural_frequencies_type,
-  ]);
+  }, [swarmalator, swarmalatorSettings.natural_frequencies_type]);
 
   const establishContext = useCallback((context: CanvasRenderingContext2D) => {
     setCtx(context);
@@ -167,36 +163,45 @@ export default function Swarmalators() {
     const { agents, dT } = swarmalatorSettings;
 
     swarmalator.update(dT);
-    const positionsPtr = swarmalator.positions();
-    const positions = new Float64Array(memory.buffer, positionsPtr, agents * 2);
-    const phasesPtr = swarmalator.phases();
-    const phases = new Float64Array(memory.buffer, phasesPtr, agents);
 
-    ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-
-    const { devicePixelRatio: ratio = 1 } = window;
-
-    for (let i = 0; i < agents; i++) {
-      const x = mapRange(
-        positions[i * 2],
-        -3,
-        3,
-        (0.1 * canvasSize.width) / ratio,
-        (0.9 * canvasSize.width) / ratio
+    try {
+      const positionsPtr = swarmalator.positions();
+      const positions = new Float64Array(
+        memory.buffer,
+        positionsPtr,
+        agents * 2
       );
-      const y = mapRange(
-        positions[i * 2 + 1],
-        -3,
-        3,
-        (0.9 * canvasSize.height) / ratio,
-        (0.1 * canvasSize.height) / ratio
-      );
+      const phasesPtr = swarmalator.phases();
+      const phases = new Float64Array(memory.buffer, phasesPtr, agents);
 
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      const phase = phases[i];
-      ctx.fillStyle = HSVtoCanvasFillStyle(phase);
-      ctx.fill();
+      ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+
+      const { devicePixelRatio: ratio = 1 } = window;
+
+      for (let i = 0; i < agents; i++) {
+        const x = mapRange(
+          positions[i * 2],
+          -3,
+          3,
+          (0.1 * canvasSize.width) / ratio,
+          (0.9 * canvasSize.width) / ratio
+        );
+        const y = mapRange(
+          positions[i * 2 + 1],
+          -3,
+          3,
+          (0.9 * canvasSize.height) / ratio,
+          (0.1 * canvasSize.height) / ratio
+        );
+
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        const phase = phases[i];
+        ctx.fillStyle = HSVtoCanvasFillStyle(phase);
+        ctx.fill();
+      }
+    } catch (e) {
+      return;
     }
   }, [ctx, canvasSize, swarmalator, memory, swarmalatorSettings]);
 
