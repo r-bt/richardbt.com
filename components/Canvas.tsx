@@ -12,7 +12,7 @@ export default function Canvas(props: {
   const {
     width = "100%",
     height = "100%",
-    backgroundColor = "#ffffff",
+    backgroundColor = "#000000",
     draw,
     establishContext,
     establishSize,

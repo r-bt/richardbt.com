@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import Canvas from "@/components/Canvas";
 import init, { Swarmalator } from "wasm-swarmalators";
 import { mapRange, HSVtoCanvasFillStyle } from "./utils";
+import CircularButton from "@/components/CircularButton";
 
 const getChiralCoefficients = (agents: number) => {
   const coeffs = Array.from({ length: agents }, (_, i) =>
@@ -42,6 +43,95 @@ const getNaturalFrequencies = (agents: number, type: number) => {
   return new Float64Array(freqs);
 };
 
+const getPhases = (agents: number, type: number) => {
+  let phases: number[] = [];
+
+  switch (type) {
+    case 0:
+      // Random
+      phases = Array.from(
+        { length: agents },
+        () => Math.random() * 2 * Math.PI
+      );
+      break;
+    case 1:
+      // Linearly spaced
+      phases = Array.from(
+        { length: agents },
+        (_, i) => (i / agents) * 2 * Math.PI
+      );
+      break;
+  }
+
+  return new Float64Array(phases);
+};
+
+interface SwarmalatorSettings {
+  agents: number;
+  dT: number;
+  K: number;
+  J: number;
+  chiral: boolean;
+  natural_frequencies_type: number;
+  phases_type: number;
+}
+
+interface Presets {
+  [key: string]: Partial<SwarmalatorSettings>; // Adjust this to match the shape of your settings
+}
+
+const presets: Presets = {
+  "bouncing-clusters": {
+    K: 1,
+    J: 1,
+    chiral: false,
+    natural_frequencies_type: 4,
+  },
+  "rainbow-circle": {
+    K: 0,
+    J: 1,
+    chiral: false,
+    natural_frequencies_type: 1,
+    phases_type: 1,
+  },
+  "radial-oscillation": {
+    K: 1,
+    J: -1,
+    chiral: false,
+    natural_frequencies_type: 4,
+    phases_type: 0,
+  },
+  dizzy: {
+    dT: 0.05,
+    K: 1,
+    J: 0.25,
+    chiral: false,
+    natural_frequencies_type: 3,
+    phases_type: 0,
+  },
+  swimming: {
+    K: 0,
+    J: 1,
+    chiral: false,
+    natural_frequencies_type: 4,
+    phases_type: 1,
+  },
+  "revolving-clusters": {
+    K: 1,
+    J: 1,
+    chiral: true,
+    natural_frequencies_type: 4,
+    phases_type: 0,
+  },
+  "overlapping-circles": {
+    K: 0,
+    J: 1,
+    chiral: true,
+    natural_frequencies_type: 4,
+    phases_type: 0,
+  },
+};
+
 export default function Swarmalators() {
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
   const [canvasSize, setCanvasSize] = useState<{
@@ -53,21 +143,16 @@ export default function Swarmalators() {
   });
   const [swarmalator, setSwarmalator] = useState<Swarmalator | null>(null);
   const [memory, setMemory] = useState<WebAssembly.Memory | null>(null);
-  const [swarmalatorSettings, setSwarmalatorSettings] = useState<{
-    agents: number;
-    dT: number;
-    K: number;
-    J: number;
-    chiral: boolean;
-    natural_frequencies_type: number;
-  }>({
-    agents: 50,
-    dT: 0.025,
-    K: 0.5,
-    J: 0,
-    chiral: false,
-    natural_frequencies_type: 0,
-  });
+  const [swarmalatorSettings, setSwarmalatorSettings] =
+    useState<SwarmalatorSettings>({
+      agents: 50,
+      dT: 0.025,
+      K: 1,
+      J: 1,
+      chiral: false,
+      natural_frequencies_type: 4,
+      phases_type: 0,
+    });
 
   // Initalize the swarmalator model
   useEffect(() => {
@@ -78,15 +163,14 @@ export default function Swarmalators() {
         { length: swarmalatorSettings.agents },
         () => [Math.random() * 6 - 3, Math.random() * 6 - 3]
       );
-      const agent_phases = Array.from(
-        { length: swarmalatorSettings.agents },
-        (_, i) => Math.random() * 2 * Math.PI
-      );
 
       const target = [2, 0];
 
       const float64_positions = new Float64Array(agent_positions.flat());
-      const float64_phases = new Float64Array(agent_phases);
+      const float64_phases = getPhases(
+        swarmalatorSettings.agents,
+        swarmalatorSettings.phases_type
+      );
       const float64_natural_frequencies = getNaturalFrequencies(
         swarmalatorSettings.agents,
         swarmalatorSettings.natural_frequencies_type
@@ -95,8 +179,6 @@ export default function Swarmalators() {
         swarmalatorSettings.agents
       );
       const float64_target = new Float64Array(target);
-
-      console.log({ float64_natural_frequencies });
 
       const swarm = new Swarmalator(
         swarmalatorSettings.agents,
@@ -148,6 +230,14 @@ export default function Swarmalators() {
       );
     }
   }, [swarmalator, swarmalatorSettings.natural_frequencies_type]);
+
+  useEffect(() => {
+    if (swarmalator) {
+      swarmalator.set_phases(
+        getPhases(swarmalatorSettings.agents, swarmalatorSettings.phases_type)
+      );
+    }
+  }, [swarmalator, swarmalatorSettings.phases_type]);
 
   const establishContext = useCallback((context: CanvasRenderingContext2D) => {
     setCtx(context);
@@ -205,7 +295,15 @@ export default function Swarmalators() {
     }
   }, [ctx, canvasSize, swarmalator, memory, swarmalatorSettings]);
 
-  const [input, setInput] = useState<string>("");
+  const setPreset = (preset: keyof Presets) => {
+    console.log(preset);
+
+    // Only change the settings if not already set
+    setSwarmalatorSettings({
+      ...swarmalatorSettings,
+      ...presets[preset],
+    });
+  };
 
   return (
     <div>
@@ -299,6 +397,23 @@ export default function Swarmalators() {
             />
           </div>
           <div className="pb-2">
+            <label htmlFor="natural-frequencies-options">Phases:</label>
+            <select
+              id="natural-frequencies-options"
+              className="w-full bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 p-2"
+              value={swarmalatorSettings.phases_type}
+              onChange={(e) =>
+                setSwarmalatorSettings({
+                  ...swarmalatorSettings,
+                  phases_type: parseInt(e.target.value),
+                })
+              }
+            >
+              <option value="0">Random</option>
+              <option value="1">Linearly Spaced</option>
+            </select>
+          </div>
+          <div className="pb-2">
             <label htmlFor="natural-frequencies-options">
               Natural frequencies:
             </label>
@@ -336,8 +451,50 @@ export default function Swarmalators() {
             />
           </div>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 md:pl-2">
           <h3 className="text-lg text-slate-500 pb-4">Simulation Presets</h3>
+          <CircularButton
+            text={"Bouncing Clusters"}
+            onClick={() => {
+              setPreset("bouncing-clusters");
+            }}
+          />
+          <CircularButton
+            text={"Rainbow Circle"}
+            onClick={() => {
+              setPreset("rainbow-circle");
+            }}
+          />
+          <CircularButton
+            text={"Radial Oscillation"}
+            onClick={() => {
+              setPreset("radial-oscillation");
+            }}
+          />
+          <CircularButton
+            text={"Dizzy"}
+            onClick={() => {
+              setPreset("dizzy");
+            }}
+          />
+          <CircularButton
+            text={"Swimming"}
+            onClick={() => {
+              setPreset("swimming");
+            }}
+          />
+          <CircularButton
+            text={"Revolving Clusters"}
+            onClick={() => {
+              setPreset("revolving-clusters");
+            }}
+          />
+          <CircularButton
+            text={"Overlapping Circles"}
+            onClick={() => {
+              setPreset("overlapping-circles");
+            }}
+          />
         </div>
       </div>
     </div>
