@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://richardbt.com/classes</loc><lastmod>2024-06-30T00:31:59.804Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/SAMD21E-dev-board</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/glass-blown-turtle</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/feline-programmable-gate-array</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/giant-inflatable-pigeon</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/maze-generator</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/laser-cut-ferris-wheel</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/molded-tesseract</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/appa-neon-sign</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/pirtate-ship</loc><lastmod>2024-06-30T00:31:59.805Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/swarmalators-sim</loc><lastmod>2024-06-30T00:31:59.806Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/prepsheets</loc><lastmod>2024-06-30T00:31:59.806Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/ideas</loc><lastmod>2024-06-30T00:31:59.806Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/3d-printed-catan</loc><lastmod>2024-06-30T00:31:59.806Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com/projects/connect-4</loc><lastmod>2024-06-30T00:31:59.806Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://richardbt.com</loc><lastmod>2024-06-30T00:31:59.806Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/ideas</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/classes</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/appa-neon-sign</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/SAMD21E-dev-board</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/3d-printed-catan</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/glass-blown-turtle</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/feline-programmable-gate-array</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/connect-4</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/maze-generator</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/giant-inflatable-pigeon</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/prepsheets</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/swarmalators-sim</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/pirtate-ship</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/laser-cut-ferris-wheel</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://richardbt.com/projects/molded-tesseract</loc><lastmod>2024-07-21T23:57:05.223Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

@@ -1,5 +1,5 @@
 import { StaticImageData } from "next/image";
-import Image from "next-export-optimize-images/image";
+import Image from "next/image";
 
 export default function ProjectImage({
   src,

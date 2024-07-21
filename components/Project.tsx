@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next-export-optimize-images/image";
+import Image from "next/image";
 import { StaticImageData } from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -26,7 +26,9 @@ export default function Project({
         <Image
           src={thumbnail}
           alt={title}
-          objectFit="cover"
+          style={{
+            objectFit: "cover",
+          }}
           fill
           className="-z-10 group-hover:blur-[7px] group-focus:blur-[3px] group-active:blur-[3px] transition ease-in-out duration-200"
         />

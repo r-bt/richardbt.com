@@ -1,4 +1,3 @@
-import withExportImages from 'next-export-optimize-images';
 import createMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm'
 
@@ -12,8 +11,6 @@ const withMDX = createMDX({
 
 const nextConfig = {
     pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
-    output: 'export',
-    distDir: 'out',
 };
 
-export default withExportImages(withMDX(nextConfig));
+export default withMDX(nextConfig);

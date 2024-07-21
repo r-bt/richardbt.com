@@ -1,5 +1,5 @@
 import { IProject } from "@/projects";
-import Image from "next-export-optimize-images/image";
+import Image from "next/image";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 import CommentBox from "./CommentBox";

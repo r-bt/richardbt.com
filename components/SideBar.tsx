@@ -1,4 +1,4 @@
-import Image from "next-export-optimize-images/image";
+import Image from "next/image";
 import bio from "@/public/bio.jpg";
 import ListElement from "@/components/ListElement";
 import { IoHomeSharp, IoLocationSharp } from "react-icons/io5";
