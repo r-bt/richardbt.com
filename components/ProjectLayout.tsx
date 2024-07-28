@@ -35,6 +35,7 @@ export default function ProjectLayout({
             src={metadata.thumbnail}
             alt={metadata.title}
             className="max-h-96 object-contain"
+            priority
           />
         </div>
       </header>

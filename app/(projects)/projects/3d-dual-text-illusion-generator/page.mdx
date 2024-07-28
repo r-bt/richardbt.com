@@ -1,0 +1,17 @@
+import thumbnail from './thumbnail.png';
+import ProjectLayout from "@/components/ProjectLayout";
+import IllusionGenerator from './IllusionGenerator';
+
+export const metadata = {
+    thumbnail,
+    title: "3D Dual Text Illusion Generator",
+    publishDate: '2024-06-30T00:00:00Z',
+    description: "Generate a custom dual letter illusion",
+    categories: ["software", "all", "3D printing"],
+};
+
+<IllusionGenerator />
+
+export default function MDXPage({ children }) {
+  return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+}
