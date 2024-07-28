@@ -80,7 +80,7 @@ export default function IllusionGenerator() {
         <p className="pb-4">
           Note if both words aren&apos;t the same length, the longer word will
           be truncated. Also, if you use lowercase letters, results may be
-          stranged due to differing letter heights.
+          strange due to differing letter heights.
         </p>
         <div className="flex gap-4 flex-col md:flex-row pb-4">
           <div className="flex-1">
