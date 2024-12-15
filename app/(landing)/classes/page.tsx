@@ -5,6 +5,14 @@ import Semester from "@/components/Semester";
 export default function Classes() {
   return (
     <>
+      <Semester title="Fall 2024">
+        <Class
+          number="6.3900 (6.036)"
+          title="Introduction to Machine Learning"
+        />
+        <Class number="6.S965" title="Digital Systems Laboratory II" />
+        <Class number="17.561" title="European Politics" />
+      </Semester>
       <Semester title="Spring 2024">
         <Class number="21M.370" title="Digital Instrument Design" />
         <Class
