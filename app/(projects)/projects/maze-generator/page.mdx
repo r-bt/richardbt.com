@@ -1,18 +1,21 @@
-import thumbnail from './thumbnail.svg';
+import thumbnail from "./thumbnail.svg";
 import ProjectLayout from "@/components/ProjectLayout";
-import MazeGenerator from './MazeGenerator';
+import MazeGenerator from "./MazeGenerator";
 
 export const metadata = {
-    thumbnail,
-    title: "Message Maze Generator",
-    publishDate: '2024-06-15T00:00:00Z',
-    description: "A maze generator that creates a maze from a message",
-    categories: ["software", "all"],
+  thumbnail,
+  title: "Message Maze Generator",
+  publishDate: "2024-06-15T00:00:00Z",
+  description: "A maze generator that creates a maze from a message",
+  categories: ["software", "all"],
 };
 
-For a friends birthday I 3D printed them a puzzle box that required them to solve a maze to open it. The twist was that the solution to the maze spelled out their name. I wanted to make a program that could generate these puzzle boxes for any name. The first step was to create a maze generator that could take a message and turn it into a maze.
+This is a tool that let's you generate mazes where the solution spells out a message of your choosing. I was experimenting with the
+Randomized Prim's algorithm and thought this would be a cool addition.
 
-I'm still getting rid of some bugs, so if you find any phrases that don't work, please let me know!
+I'd like to credit Dr. David Grossman and his work on <a href="https://www.mazebrite.com/" className="underline">Mazebrite.com</a>, which provided the inspiration for this idea.
+As I needed SVGs of the mazes, and Dr. Grossman's version is closed-source, I decided to create my own implementation. However, his font and mazes provided
+inspiration for mine.
 
 <hr className="my-8" />
 
@@ -20,4 +23,5 @@ I'm still getting rid of some bugs, so if you find any phrases that don't work, 
 
 export default function MDXPage({ children }) {
   return <ProjectLayout metadata={metadata}>{children}</ProjectLayout>
+
 }
