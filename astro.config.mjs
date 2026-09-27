@@ -25,15 +25,9 @@ export default defineConfig({
       // These packages ship browser-only builds (wasm-pack output, bundler-only
       // "module" fields, etc.) that Node's native ESM resolver can't load
       // directly. Forcing Vite to bundle them for SSR sidesteps that.
-      noExternal: [
-        "wasm-swarmalators",
-        "@jscad/modeling",
-        "@jscad/3mf-serializer",
-        "jscad-fiber",
-        "jscad-text",
-        "fflate",
-        "three",
-      ],
+      noExternal: ["wasm-swarmalators", "three"],
     },
+    // The nameplate generator's worker imports ES modules and WASM.
+    worker: { format: "es" },
   },
 });

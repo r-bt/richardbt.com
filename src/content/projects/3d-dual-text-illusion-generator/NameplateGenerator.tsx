@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react";
 
-// The generator and its 3D dependencies (jscad, three, opentype) include
-// CommonJS packages that crash when Astro evaluates them on the server, even
-// for client:only components. Importing them lazily keeps them browser-only.
+// The generator uses a Web Worker, WASM and three.js, none of which can run
+// when Astro evaluates modules on the server (it does so even for client:only
+// components). Importing it lazily keeps all of that browser-only.
 const IllusionGenerator = lazy(() => import("./IllusionGenerator"));
 
 export default function NameplateGenerator() {

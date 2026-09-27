@@ -3,11 +3,13 @@ export default function Input({
   onChange,
   placeholder,
   id,
+  autoCapitalize,
 }: {
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   id?: string;
+  autoCapitalize?: string;
 }) {
   return (
     <input
@@ -17,6 +19,9 @@ export default function Input({
       className="ui-input"
       onChange={onChange}
       placeholder={placeholder}
+      autoCapitalize={autoCapitalize}
+      autoComplete="off"
+      spellCheck={false}
     />
   );
 }
