@@ -1,0 +1,45 @@
+---
+title: "Laser Cut Ferris Wheel"
+description: "A laser-cut, glue-free ferris wheel that actually turns"
+publishDate: 2022-09-21T00:00:00Z
+thumbnail: ./thumbnail.jpg
+categories:
+  - maker
+  - all
+---
+
+import FerrisWheelViewer from "./FerrisWheelViewer";
+
+I built this working ferris wheel for my week two assignment for How to Make Almost Anything (HTMAA) (6.9020). I wanted to learn about parametric design, [living hinges](https://en.wikipedia.org/wiki/Living_hinge) and wooden joints. Every piece was designed in Fusion 360, then laser cut and assembled. No glue anywhere.
+
+## Designing the ferris wheel
+
+I split the design into two parts:
+
+1. The ferris wheel itself
+2. The base
+
+For the base, I wanted to see how the sides would bend, so I used Fusion 360's **Sheet Metal** tool. That let me fit the parts together while bent, then export a flattened DXF for laser cutting. I used a reference image for the living hinges and rectangular patterned it along the sides of the base.
+
+![Base designed as bent sheet metal](./sheet-metal-box.png)
+*Extruded sheet metal base*
+
+For the wheel, I drew everything in sketches and extruded it. All the pieces have finger joints, and I used the **Joint** tool to check everything fitted together.
+
+<FerrisWheelViewer client:only="react" />
+
+## Laser cutting the parts
+
+Laser cutting means accounting for kerf. Thankfully there's a Fusion 360 plugin, [DXF For Laser](https://apps.autodesk.com/FUSION/en/Detail/Index?id=7634902334100976871&os=Win64&appLang=en), that exports **.dxf** files from your bodies' faces and offsets the dimensions for kerf.
+
+I exported all my bodies, made some test cuts, then cut everything out. It took a few tries to get the kerf right, but in the end, with the help of a pallet, everything fitted together.
+
+<div class="side-by-side">
+
+![Parts being laser cut](./laser-cutting-parts.jpg)
+*Laser cutting the parts*
+
+![Assembled ferris wheel](./finished-ferris-wheel.jpg)
+*Assembled ferris wheel*
+
+</div>

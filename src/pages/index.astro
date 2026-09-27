@@ -1,0 +1,83 @@
+---
+import Shell from "../layouts/Shell.astro";
+import EntryList from "../components/EntryList.astro";
+import { getNotes, getProjects, isHighlight } from "../lib/content";
+import { noteEntries, projectEntries } from "../lib/entries";
+
+const [notes, projects] = await Promise.all([getNotes(), getProjects()]);
+
+// The home page shows a few recent notes and the highlighted projects;
+// everything else lives on /notes and /projects.
+const HOME_NOTES = 5;
+const recentNotes = noteEntries(notes.slice(0, HOME_NOTES));
+const highlights = await projectEntries(projects.filter(isHighlight));
+---
+
+<Shell home>
+  <div class="frame pt-8 sm:pt-14">
+    <header class="flex items-start justify-between gap-4 sm:gap-6">
+      <h1 class="shrink-0 whitespace-nowrap pt-2 text-[2rem] font-semibold leading-[1.1] tracking-[-0.015em] text-ink sm:text-[2.5rem]">
+        Richard Beattie
+      </h1>
+      <img
+        src="/avatar.svg"
+        alt="A bat in safety goggles, soldering a circuit board"
+        width="1394"
+        height="1128"
+        class="-mt-2 h-14 w-auto min-w-0 object-contain object-right sm:h-24"
+      />
+    </header>
+
+    <section class="mt-8 space-y-4 text-pretty">
+      <p>Hi, I'm Richard</p>
+      <p>
+        I like <a class="link" href="/projects/connect-4">robots</a>,
+        <a class="link" href="/projects/makey-makey">IoT</a> and
+        <a class="link" href="/projects/3d-printed-catan">digital fabrication</a>
+      </p>
+      <p>
+        Currently, I'm an engineer at C5R building the physical environments where models
+        can conduct scientific research. 
+      </p>
+      <p>
+        I grew up in Dublin, Ireland. As a teenager, I became obsessed with bats and
+        built bat detectors for a tenth of the usual cost, which took me to the
+        International Science and Engineering Fair, where the project placed in
+        the top 15 worldwide. I then spent five years studying EECS at MIT,
+        building robots in my spare time and doing research with
+        <a class="link" href="https://danielarus.csail.mit.edu/">Prof. Daniela Rus</a>,
+        including work on <a class="link" href="/projects/swarmalators-sim">swarm robotics</a>.
+      </p>
+      <p class="meta flex flex-wrap gap-x-4 gap-y-1 pt-1">
+        <a class="quiet-link" href="https://github.com/r-bt">GitHub</a>
+        <a class="quiet-link" href="https://www.linkedin.com/in/richard--beattie/">LinkedIn</a>
+        <a class="quiet-link" href="/resume.pdf">Résumé</a>
+      </p>
+    </section>
+
+    {
+      recentNotes.length > 0 && (
+        <section id="notes" class="mt-16 scroll-mt-8">
+          <h2 class="label mb-3">Notes</h2>
+          <EntryList entries={recentNotes} />
+          {notes.length > HOME_NOTES && (
+            <p class="meta mt-3 pl-[3.75rem] sm:pl-[4.5rem]">
+              <a class="quiet-link" href="/notes">All notes →</a>
+            </p>
+          )}
+        </section>
+      )
+    }
+
+    <section id="projects" class="mt-16 scroll-mt-8">
+      <div class="mb-3 flex items-baseline justify-between gap-4">
+        <h2 class="label">Highlights</h2>
+        <a class="meta quiet-link" href="/projects">All projects →</a>
+      </div>
+      <EntryList entries={highlights} showYears={false} />
+      <p class="meta mt-4">
+        <a class="quiet-link" href="/projects">See all {projects.length} projects →</a>
+      </p>
+    </section>
+  </div>
+</Shell>

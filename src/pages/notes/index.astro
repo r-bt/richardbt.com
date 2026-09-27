@@ -1,0 +1,15 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import EntryList from "../../components/EntryList.astro";
+import { getNotes } from "../../lib/content";
+import { noteEntries } from "../../lib/entries";
+
+const entries = noteEntries(await getNotes());
+---
+
+<Shell title="Notes" section="notes">
+  <div class="frame">
+    <h1 class="label mb-3">Notes</h1>
+    {entries.length > 0 ? <EntryList entries={entries} /> : <p class="text-muted">Nothing here yet.</p>}
+  </div>
+</Shell>

@@ -1,0 +1,47 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import Shell from "./Shell.astro";
+
+interface Props {
+  section: "notes" | "projects";
+  title: string;
+  description: string;
+  /** Small mono details after the section name, e.g. year and topics. */
+  meta?: string[];
+  hero?: ImageMetadata;
+  draft?: boolean;
+}
+
+const { section, title, description, meta = [], hero, draft = false } = Astro.props;
+
+const sectionLabel = { notes: "Notes", projects: "Projects" }[section];
+---
+
+<Shell title={title} description={description} section={section}>
+  <article class="article">
+    <header class="article-header">
+      <p class="eyebrow meta">
+        <a class="bare" href={`/${section}`}>{sectionLabel}</a>
+        {meta.map((item) => <span> · {item}</span>)}
+        {draft && <span class="text-accent-text"> · draft</span>}
+      </p>
+      <h1>{title}</h1>
+      <p class="lede">{description}</p>
+    </header>
+
+    {
+      hero && (
+        <div class="hero wide">
+          <Image src={hero} alt="" widths={[640, 960, 1280]} sizes="(min-width: 50rem) 50rem, 100vw" loading="eager" />
+        </div>
+      )
+    }
+
+    <slot />
+
+    <p class="meta mt-16">
+      <a href={`/${section}`} class="quiet-link bare">← All {sectionLabel.toLowerCase()}</a>
+    </p>
+  </article>
+</Shell>

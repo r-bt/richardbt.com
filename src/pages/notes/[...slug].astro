@@ -1,0 +1,24 @@
+---
+import { render } from "astro:content";
+import Article from "../../layouts/Article.astro";
+import { formatDate, getNotes, slugOf, type Note } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return notes.map((note) => ({
+    params: { slug: slugOf(note.id) },
+    props: { note },
+  }));
+}
+
+const { note } = Astro.props as { note: Note };
+const { Content } = await render(note);
+const { title, description, publishDate, updatedDate, draft } = note.data;
+
+const meta = [formatDate(publishDate)];
+if (updatedDate) meta.push(`updated ${formatDate(updatedDate)}`);
+---
+
+<Article section="notes" title={title} description={description} meta={meta} draft={draft}>
+  <Content />
+</Article>

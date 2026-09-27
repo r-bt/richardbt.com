@@ -1,0 +1,140 @@
+---
+export interface Entry {
+  href: string;
+  title: string;
+  description: string;
+  year: number;
+  thumb?: string;
+  badge?: string;
+}
+
+interface Props {
+  entries: Entry[];
+  /** Show the year column. Off for curated lists like the homepage highlights. */
+  showYears?: boolean;
+  /** Print each year once, like a changelog, instead of on every row. */
+  groupYears?: boolean;
+}
+
+const { entries, showYears = true, groupYears = true } = Astro.props;
+---
+
+<div class="entry-list relative" data-entry-list>
+  <ul>
+    {
+      entries.map((entry, i) => {
+        const showYear = !groupYears || i === 0 || entries[i - 1].year !== entry.year;
+        return (
+          <li>
+            <a
+              href={entry.href}
+              class:list={[
+                "entry group grid gap-x-2 py-[0.55rem] no-underline",
+                showYears && "grid-cols-[3.25rem_1fr] sm:grid-cols-[4rem_1fr]",
+              ]}
+              data-thumb={entry.thumb}
+            >
+              {showYears && (
+                <span class="meta pt-[0.3rem] text-faint" aria-hidden={!showYear}>
+                  {showYear ? entry.year : ""}
+                </span>
+              )}
+              <span class="block">
+                <span class="entry-title text-ink">
+                  {entry.title}
+                </span>
+                {entry.badge && (
+                  <span class="ml-2 align-[0.1em] font-mono text-[0.6875rem] uppercase tracking-wider text-accent-text">
+                    {entry.badge}
+                  </span>
+                )}
+                <span class="block text-[0.9375rem] leading-snug text-muted">
+                  {entry.description}
+                </span>
+              </span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+  <img class="entry-preview" alt="" aria-hidden="true" decoding="async" />
+</div>
+
+<style>
+  .entry-title {
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color 120ms ease;
+  }
+
+  .entry:hover .entry-title,
+  .entry:focus-visible .entry-title {
+    text-decoration-color: var(--accent);
+  }
+
+  .entry-preview {
+    display: none;
+  }
+
+  @media (hover: hover) and (min-width: 1100px) {
+    .entry-preview {
+      display: block;
+      position: absolute;
+      left: calc(100% + 3rem);
+      top: 0;
+      width: 15rem;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 3px;
+      background: var(--tint);
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+      transition:
+        opacity 160ms ease,
+        transform 160ms ease,
+        top 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .entry-preview.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // Desktop-only: show the hovered row's thumbnail in the empty right margin.
+  const canHover = window.matchMedia("(hover: hover) and (min-width: 1100px)");
+
+  document.querySelectorAll<HTMLElement>("[data-entry-list]").forEach((list) => {
+    const preview = list.querySelector<HTMLImageElement>(".entry-preview");
+    if (!preview) return;
+
+    const show = (row: HTMLElement) => {
+      const src = row.dataset.thumb;
+      if (!canHover.matches || !src) return hide();
+      if (preview.getAttribute("src") !== src) preview.src = src;
+      preview.style.top = `${row.offsetTop}px`;
+      preview.classList.add("is-visible");
+    };
+
+    const hide = () => preview.classList.remove("is-visible");
+
+    list.querySelectorAll<HTMLElement>(".entry").forEach((row) => {
+      row.addEventListener("mouseenter", () => show(row));
+      row.addEventListener("focus", () => show(row));
+      row.addEventListener("blur", hide);
+      // Warm the cache so the first hover doesn't flash empty.
+      if (canHover.matches && row.dataset.thumb) {
+        const img = new Image();
+        img.src = row.dataset.thumb;
+      }
+    });
+
+    list.addEventListener("mouseleave", hide);
+  });
+</script>

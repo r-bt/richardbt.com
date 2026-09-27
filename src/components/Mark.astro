@@ -1,0 +1,32 @@
+---
+// The 1213t mark, read straight from public/logo.svg so that file stays the
+// single source. It's drawn on a padded canvas, so crop to the letters and
+// paint it in the surrounding text colour.
+import logo from "../../public/logo.svg?raw";
+
+interface Props {
+  class?: string;
+  title?: string;
+}
+
+const { class: className, title = "1213t" } = Astro.props;
+
+// Bounds of the lettering inside logo.svg's 1774×887 canvas. Update if the artwork moves.
+const CROP = "303 150 1092 572";
+
+const inner = logo
+  .replace(/^[\s\S]*?<svg[^>]*>/, "")
+  .replace(/<\/svg>\s*$/, "")
+  .replace(/<title[\s\S]*?<\/title>/, "")
+  .replace(/fill="#000(000)?"/g, 'fill="currentColor"');
+---
+
+<svg
+  class={className}
+  viewBox={CROP}
+  role="img"
+  aria-label={title}
+  fill="currentColor"
+  xmlns="http://www.w3.org/2000/svg"
+  set:html={inner}
+/>

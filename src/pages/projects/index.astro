@@ -1,0 +1,15 @@
+---
+import Shell from "../../layouts/Shell.astro";
+import EntryList from "../../components/EntryList.astro";
+import { getProjects } from "../../lib/content";
+import { projectEntries } from "../../lib/entries";
+
+const entries = await projectEntries(await getProjects());
+---
+
+<Shell title="Projects" section="projects">
+  <div class="frame">
+    <h1 class="label mb-3">Projects</h1>
+    <EntryList entries={entries} />
+  </div>
+</Shell>

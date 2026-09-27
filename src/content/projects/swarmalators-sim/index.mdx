@@ -1,0 +1,20 @@
+---
+title: "Swarmalators Simulation"
+description: "An interactive simulation of the swarmalator swarm robotics model"
+publishDate: 2024-06-22T00:00:00Z
+thumbnail: ./thumbnail.png
+categories:
+  - software
+  - all
+  - highlights
+---
+
+import Swarmalators from "./Swarmalators";
+
+At MIT I'm part of the Distributed Robotics Laboratory at CSAIL, where I'm working on implementing swarm robotics models on physical robots. Specifically, I've been looking at the emergent behaviours of the [swarmalator](https://en.wikipedia.org/wiki/Swarmalators) model.
+
+In this model, robots affect each other spatially (their position) and temporally (their phase) according to a set of equations. This gives rise to emergent behaviours such as synchronization, clustering and bouncing.
+
+While the physical robots are still in development, I've built a simulation of the swarmalator model based on the [paper](https://www.nature.com/articles/s41467-023-36563-4) by Ceron, S., O’Keeffe, K. & Petersen, K.
+
+<Swarmalators client:load />
