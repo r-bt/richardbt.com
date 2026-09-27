@@ -27,51 +27,49 @@ function isCoordsEq([x1, y1]: [number, number], [x2, y2]: [number, number]) {
 }
 
 /**
- * A set of coordinates that allows for adding, removing, and checking if a coordinate exists`
+ * A set of coordinates with O(1) add, remove, lookup and random pick. Cells
+ * live in an array (so a random one is a single index) and a map from cell to
+ * array position lets remove swap the last cell into the gap.
  */
 export default class CoordinateSet {
-  tree: Record<number, Record<number, boolean>> = {};
-  size = 0;
+  private cells: [number, number][] = [];
+  private index = new Map<number, number>();
+
+  // Mazes are far narrower than this, so x and y can share one number.
+  private key(x: number, y: number) {
+    return x * 1_000_000 + y;
+  }
+
+  get size() {
+    return this.cells.length;
+  }
 
   add(x: number, y: number) {
-    if (!this.has(x, y)) {
-      this.tree[x] ||= {};
-      this.tree[x][y] = true;
-      this.size++;
-    }
+    const k = this.key(x, y);
+    if (this.index.has(k)) return;
+    this.index.set(k, this.cells.length);
+    this.cells.push([x, y]);
   }
 
   remove(x: number, y: number) {
-    // if the coordinate doesn't exist, don't do anything
-    if (!this.tree[x] || !this.tree[x][y]) {
-      return;
+    const k = this.key(x, y);
+    const i = this.index.get(k);
+    if (i === undefined) return;
+    const last = this.cells.pop()!;
+    if (i < this.cells.length) {
+      this.cells[i] = last;
+      this.index.set(this.key(last[0], last[1]), i);
     }
-
-    // otherwise, delete it
-    delete this.tree[x][y];
-    this.size--;
-
-    // if the branch has no leaves, delete the branch, too
-    if (!Object.keys(this.tree[x]).length) {
-      delete this.tree[x];
-    }
+    this.index.delete(k);
   }
 
   has(x: number, y: number) {
-    return !!this.tree[x]?.[y];
+    return this.index.has(this.key(x, y));
   }
 
-  getRandomCell() {
-    const xKeys = Object.keys(this.tree);
-    if (xKeys.length === 0) {
-      return null;
-    }
-
-    const randomX = xKeys[Math.floor(Math.random() * xKeys.length)];
-    const yKeys = Object.keys(this.tree[parseInt(randomX)]);
-    const randomY = yKeys[Math.floor(Math.random() * yKeys.length)];
-
-    return [parseInt(randomX), parseInt(randomY)];
+  getRandomCell(): [number, number] | null {
+    if (this.cells.length === 0) return null;
+    return this.cells[Math.floor(Math.random() * this.cells.length)];
   }
 }
 
@@ -94,7 +92,29 @@ interface Line {
  * @param multiline - Whether the text is multi-line or not. If true, we will split when text would be greater than width
  * @returns
  */
+/** Attempts before giving up on joining every character into one solution. */
+const MAX_ATTEMPTS = 8;
+
+/**
+ * Generates a maze whose solution spells `text`. Joining the characters up is
+ * random and occasionally paints itself into a corner, so if any connection
+ * can't be made the maze is simply generated again.
+ */
 export function createMaze(
+  width?: number,
+  height?: number,
+  text?: string,
+  multiline?: boolean
+) {
+  let maze = createMazeOnce(width, height, text, multiline);
+  for (let attempt = 1; maze.failed && attempt < MAX_ATTEMPTS; attempt++) {
+    maze = createMazeOnce(width, height, text, multiline);
+  }
+  const { failed: _failed, ...result } = maze;
+  return result;
+}
+
+function createMazeOnce(
   width?: number,
   height?: number,
   text?: string,
@@ -105,8 +125,16 @@ export function createMaze(
   extraPathPoints: [number, number][];
   width: number;
   height: number;
+  failed: boolean;
 } {
-  if ((!width || !height) && (!text || text.length === 0)) {
+  // Keep only characters we have shapes for, and drop leading/trailing
+  // spaces: the solution has to start and end on a letter.
+  text = Array.from(text ?? "")
+    .filter((c) => letters[c] !== undefined)
+    .join("")
+    .trim();
+
+  if ((!width || !height) && text.length === 0) {
     throw new Error("Width and height or text must be provided");
   }
 
@@ -191,6 +219,9 @@ export function createMaze(
       mazeHeight += TOP_BOTTOM_MARGIN * 2 - (mazeHeight - textHeight);
     }
   }
+
+  // Set when a connection between characters can't be made
+  let failed = false;
 
   // Create a 2D array of 0s with the given width and height
   const grid = Array.from(Array(mazeHeight), (_) => Array(mazeWidth).fill(0));
@@ -348,8 +379,9 @@ export function createMaze(
 
     // let reached_side = false; // If we're going to a new line we need to go past the end point before we can go down
 
-    while (stack.length > 0) {
-      const cell = stack.shift();
+    let head = 0;
+    while (head < stack.length) {
+      const cell = stack[head++];
 
       if (cell == undefined) {
         return undefined;
@@ -520,6 +552,21 @@ export function createMaze(
 
         allocate_path_from_points(points);
 
+        // Connect the maze entrance to the first character straight away,
+        // while its start is guaranteed to be open. Left until the end, the
+        // path from this character to the next can wrap around it and seal
+        // the start off (e.g. "?" or "2", which finish on their left side).
+        if (previous_ending_point == undefined) {
+          const connecting_path = find_windy_path([0, 0], points[0], true);
+
+          if (connecting_path != undefined) {
+            allocate_path_from_points(connecting_path);
+            extraPathPoints = extraPathPoints.concat(connecting_path);
+          } else {
+            failed = true; // "No windy path from start to first letter"
+          }
+        }
+
         if (c != " ") {
           letterPoints = letterPoints.concat(points);
         }
@@ -537,10 +584,8 @@ export function createMaze(
               allocate_path_from_points(path);
               extraPathPoints = extraPathPoints.concat(path);
             } else {
-              console.error(
-                "No path from previous ending point to start of letter for ",
+              failed = true; // "No path from previous ending point to start of letter"
                 c
-              );
             }
           }
         }
@@ -559,28 +604,13 @@ export function createMaze(
       letter_offset[1] += CHAR_HEIGHT + LINE_SPACING;
     });
 
-    // Connect the start of the first character with the start of the maze
-    const start: [number, number] = [
-      inital_offset[0] + letters[solution[0]]["path"][0][0],
-      inital_offset[1] + letters[solution[0]]["path"][0][1],
-    ];
-
-    let connecting_path = find_windy_path([0, 0], start, true);
-
-    if (connecting_path != undefined) {
-      allocate_path_from_points(connecting_path);
-      extraPathPoints = extraPathPoints.concat(connecting_path);
-    } else {
-      console.error("No windy path from start to first letter");
-    }
-
     // Connect the end of the last character with the end of the maze
 
     if (!previous_ending_point) {
       throw new Error("No previous ending point");
     }
 
-    connecting_path = find_windy_path(
+    const connecting_path = find_windy_path(
       [mazeWidth - 1, mazeHeight - 1],
       previous_ending_point,
       true
@@ -589,6 +619,8 @@ export function createMaze(
     if (connecting_path != undefined) {
       allocate_path_from_points(connecting_path);
       extraPathPoints = extraPathPoints.concat(connecting_path);
+    } else {
+      failed = true; // "No windy path from last letter to the exit"
     }
 
     // Connect the end of all the lines with the end of the maze
@@ -599,7 +631,7 @@ export function createMaze(
         allocate_path_from_points(path);
         extraPathPoints = extraPathPoints.concat(path);
       } else {
-        console.error("No path from line ending to next line start");
+        failed = true; // "No path from line ending to next line start"
       }
     });
   };
@@ -663,5 +695,6 @@ export function createMaze(
     extraPathPoints,
     width: mazeWidth,
     height: mazeHeight,
+    failed,
   };
 }

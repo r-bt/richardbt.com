@@ -1,98 +1,88 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createMaze } from "./maze";
 import { drawMaze } from "./draw_maze";
 import letters from "./letters";
 import Button from "./Button";
 
 const DEFAULT_MESSAGE = "Hello";
+const MIN_SIZE = 10;
+const MAX_SIZE = 200;
+
+/** A size field's value, or null while it's empty or out of range. */
+const parseSize = (value: string) => {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= MIN_SIZE && n <= MAX_SIZE ? n : null;
+};
 
 export default function MazeGenerator() {
   const mazeContainer = useRef<HTMLDivElement>(null);
 
   const [mazeText, setMazeText] = useState<string>(DEFAULT_MESSAGE);
-  const [generated, setGenerated] = useState<boolean>(false);
+  const [widthInput, setWidthInput] = useState("65");
+  const [heightInput, setHeightInput] = useState("25");
   const [showSolution, setShowSolution] = useState<boolean>(true);
   const [svgs, setSvgs] = useState<{ solved: string; unsolved: string }>();
-  const [hrefs, setHrefs] = useState<{
-    solved: string;
-    unsolved: string;
-  }>({ solved: "", unsolved: "" });
-  const [mazeAttributes, setMazeAttributes] = useState<{
-    width: number;
-    height: number;
-  }>({ width: 65, height: 25 });
-  const [errorChars, setErrorChars] = useState<string[]>([]);
 
-  const generate = () => {
-    if (errorChars.length > 0 || mazeText.trim() === "") return;
+  const width = parseSize(widthInput);
+  const height = parseSize(heightInput);
 
-    const { passages, letterPoints, extraPathPoints, width, height } =
-      createMaze(mazeAttributes.width, mazeAttributes.height, mazeText, true);
+  // Characters without a maze letter are skipped rather than blocking.
+  const skipped = useMemo(
+    () => [...new Set(Array.from(mazeText).filter((c) => letters[c] === undefined))],
+    [mazeText]
+  );
 
-    const solvedSvg = drawMaze(passages, width, height, letterPoints, extraPathPoints);
-    const unsolvedSvg = drawMaze(passages, width, height, [], []);
-
-    setSvgs({ solved: solvedSvg.svg(), unsolved: unsolvedSvg.svg() });
-
-    // Download links
-    if (hrefs.solved) URL.revokeObjectURL(hrefs.solved);
-    if (hrefs.unsolved) URL.revokeObjectURL(hrefs.unsolved);
-
-    setHrefs({
-      solved: URL.createObjectURL(
-        new Blob([solvedSvg.svg()], { type: "image/svg+xml" })
-      ),
-      unsolved: URL.createObjectURL(
-        new Blob([unsolvedSvg.svg()], { type: "image/svg+xml" })
-      ),
-    });
-    setGenerated(true);
-  };
-
-  // Show an example straight away rather than an empty box.
+  // Rebuild shortly after the message or size changes.
   useEffect(() => {
-    generate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (width === null || height === null) return;
+
+    const timer = setTimeout(() => {
+      const { passages, letterPoints, extraPathPoints, width: w, height: h } = createMaze(
+        width,
+        height,
+        mazeText,
+        true
+      );
+      setSvgs({
+        solved: drawMaze(passages, w, h, letterPoints, extraPathPoints),
+        unsolved: drawMaze(passages, w, h, [], []),
+      });
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [mazeText, width, height]);
 
   useEffect(() => {
     if (!svgs || !mazeContainer.current) return;
     mazeContainer.current.innerHTML = showSolution ? svgs.solved : svgs.unsolved;
     const svg = mazeContainer.current.querySelector("svg");
     svg?.setAttribute("width", "100%");
-    svg?.setAttribute("height", "100%");
+    svg?.removeAttribute("height");
   }, [svgs, showSolution]);
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMazeText(e.target.value);
+  const hrefs = useMemo(() => {
+    if (!svgs) return undefined;
+    return {
+      solved: URL.createObjectURL(new Blob([svgs.solved], { type: "image/svg+xml" })),
+      unsolved: URL.createObjectURL(new Blob([svgs.unsolved], { type: "image/svg+xml" })),
+    };
+  }, [svgs]);
 
-    const newErrorChars: Set<string> = new Set();
-
-    e.target.value.split("").forEach((char) => {
-      if (letters[char] === undefined) {
-        newErrorChars.add(char);
+  useEffect(
+    () => () => {
+      if (hrefs) {
+        URL.revokeObjectURL(hrefs.solved);
+        URL.revokeObjectURL(hrefs.unsolved);
       }
-    });
-
-    setErrorChars(Array.from(newErrorChars));
-  };
-
-  const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMazeAttributes({ ...mazeAttributes, width: parseInt(e.target.value) });
-  };
-
-  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMazeAttributes({ ...mazeAttributes, height: parseInt(e.target.value) });
-  };
+    },
+    [hrefs]
+  );
 
   return (
     <div className="panel p-4 sm:p-5">
       <form
-        className="grid gap-3 sm:grid-cols-[1fr_6rem_6rem_auto] sm:items-end"
-        onSubmit={(e) => {
-          e.preventDefault();
-          generate();
-        }}
+        className="grid gap-3 sm:grid-cols-[1fr_6rem_6rem] sm:items-end"
+        onSubmit={(e) => e.preventDefault()}
       >
         <div>
           <label className="ui-label" htmlFor="maze-message">
@@ -103,7 +93,7 @@ export default function MazeGenerator() {
             value={mazeText}
             type="text"
             className="ui-input"
-            onChange={handleInput}
+            onChange={(e) => setMazeText(e.target.value)}
             placeholder="Enter a message"
             autoComplete="off"
           />
@@ -114,11 +104,13 @@ export default function MazeGenerator() {
           </label>
           <input
             id="maze-width"
-            value={mazeAttributes.width}
-            onChange={handleWidthChange}
+            value={widthInput}
+            onChange={(e) => setWidthInput(e.target.value)}
             type="number"
-            min={10}
+            min={MIN_SIZE}
+            max={MAX_SIZE}
             className="ui-input"
+            aria-invalid={width === null}
           />
         </div>
         <div>
@@ -127,26 +119,26 @@ export default function MazeGenerator() {
           </label>
           <input
             id="maze-height"
-            value={mazeAttributes.height}
-            onChange={handleHeightChange}
+            value={heightInput}
+            onChange={(e) => setHeightInput(e.target.value)}
             type="number"
-            min={10}
+            min={MIN_SIZE}
+            max={MAX_SIZE}
             className="ui-input"
+            aria-invalid={height === null}
           />
         </div>
-        <button
-          type="submit"
-          className="ui-button ui-button--primary"
-          disabled={errorChars.length > 0 || mazeText.trim() === ""}
-        >
-          {generated ? "Regenerate" : "Generate"}
-        </button>
       </form>
 
       <div className="min-h-6 pt-2" aria-live="polite">
-        {errorChars.length > 0 && (
-          <p className="ui-error">
-            Not supported: {errorChars.map((c) => (c === " " ? "space" : c)).join(" ")}
+        {(width === null || height === null) && (
+          <p className="ui-hint">
+            Width and height go from {MIN_SIZE} to {MAX_SIZE}.
+          </p>
+        )}
+        {skipped.length > 0 && (
+          <p className="ui-hint">
+            Skipping {skipped.map((c) => (c === "\n" ? "new line" : c)).join(" ")}
           </p>
         )}
       </div>
@@ -158,7 +150,7 @@ export default function MazeGenerator() {
         aria-label={`A maze whose solution spells "${mazeText}"`}
       ></div>
 
-      {generated && (
+      {hrefs && (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
           <label className="ui-hint flex cursor-pointer items-center gap-2">
             <input
