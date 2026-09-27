@@ -291,6 +291,22 @@
   font-style: italic;
 }
 
+/* Asides: small print, e.g. credits and attributions. */
+.article aside:not(astro-island *) {
+  margin-top: 1.25em;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.article aside:not(astro-island *) p {
+  margin-top: 0;
+}
+
+.article aside:not(astro-island *) a {
+  color: inherit;
+}
+
 .article hr:not(astro-island *) {
   margin: 3em auto;
   width: 4rem;
