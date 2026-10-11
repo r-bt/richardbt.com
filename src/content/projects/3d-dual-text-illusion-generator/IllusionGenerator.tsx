@@ -82,7 +82,7 @@ export default function IllusionGenerator() {
       setBuildMs(data.ms);
       setFileURL((previous) => {
         if (previous) URL.revokeObjectURL(previous);
-        return URL.createObjectURL(new Blob([data.threeMF], { type: "model/3mf" }));
+        return URL.createObjectURL(new Blob([data.threeMF as Uint8Array<ArrayBuffer>], { type: "model/3mf" }));
       });
     };
 

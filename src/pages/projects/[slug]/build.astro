@@ -1,0 +1,30 @@
+---
+import { render } from "astro:content";
+import Article from "../../../layouts/Article.astro";
+import { getBuilds, getProjects, slugOf, type Build, type Project } from "../../../lib/content";
+
+// One page per project that has a build.mdx next to its index.mdx.
+export async function getStaticPaths() {
+  const [projects, builds] = await Promise.all([getProjects(), getBuilds()]);
+  return builds.flatMap((build) => {
+    const slug = slugOf(build.id).replace(/\/build$/, "");
+    const project = projects.find((p) => slugOf(p.id) === slug);
+    return project ? [{ params: { slug }, props: { build, project } }] : [];
+  });
+}
+
+const { build, project } = Astro.props as { build: Build; project: Project };
+const { Content } = await render(build);
+const slug = slugOf(project.id);
+---
+
+<Article
+  section="projects"
+  title={build.data.title ?? "How it was made"}
+  description={build.data.description ?? project.data.description}
+  meta={[project.data.title]}
+  back={{ href: `/projects/${slug}`, label: `← ${project.data.title}` }}
+  pageTitle={`${build.data.title ?? "How it was made"} · ${project.data.title}`}
+>
+  <Content />
+</Article>

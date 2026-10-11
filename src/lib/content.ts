@@ -2,6 +2,7 @@ import { getCollection, type CollectionEntry } from "astro:content";
 
 export type Project = CollectionEntry<"projects">;
 export type Note = CollectionEntry<"notes">;
+export type Build = CollectionEntry<"builds">;
 
 /** `connect-4/index` → `connect-4` */
 export function slugOf(id: string): string {
@@ -13,6 +14,16 @@ const byNewest = <T extends { data: { publishDate: Date } }>(a: T, b: T) =>
 
 export async function getProjects(): Promise<Project[]> {
   return (await getCollection("projects")).sort(byNewest);
+}
+
+/** The build write-up for a project, if it has one. */
+export async function getBuild(projectSlug: string): Promise<Build | undefined> {
+  const builds = await getCollection("builds");
+  return builds.find((build) => slugOf(build.id).replace(/\/build$/, "") === projectSlug);
+}
+
+export async function getBuilds(): Promise<Build[]> {
+  return getCollection("builds");
 }
 
 export async function getNotes(): Promise<Note[]> {

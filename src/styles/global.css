@@ -569,3 +569,38 @@
     animation-duration: 0ms !important;
   }
 }
+
+/* Link from a project to its build write-up. */
+.build-link {
+  grid-column: content;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--tint);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 120ms ease;
+}
+
+.build-link:hover {
+  border-color: var(--accent);
+}
+
+.build-link-title {
+  font-weight: 600;
+}
+
+.build-link-arrow {
+  font-family: var(--mono);
+  color: var(--accent-text);
+  transition: transform 120ms ease;
+}
+
+.build-link:hover .build-link-arrow {
+  transform: translateX(3px);
+}

@@ -3,7 +3,7 @@ import Module from "manifold-3d";
 import wasmUrl from "manifold-3d/manifold.wasm?url";
 import { loadFont } from "./fonts";
 import { generateIllusionManifold, type MeshData } from "./generator-manifold";
-import { toThreeMF } from "./threemf";
+import { toThreeMF } from "../../../lib/threemf";
 
 export type GenerateRequest = {
   id: number;
@@ -30,7 +30,7 @@ self.onmessage = async ({ data }: MessageEvent<GenerateRequest>) => {
     const [wasm, font] = await Promise.all([manifold, loadFont(fontUrl)]);
     const start = performance.now();
     const mesh = generateIllusionManifold(wasm, font, firstWord, secondWord, padding, fillet);
-    const threeMF = toThreeMF(mesh);
+    const threeMF = toThreeMF([{ name: "Nameplate", mesh }], { yUp: true });
     const ms = performance.now() - start;
 
     const response: GenerateResponse = { id, ok: true, mesh, threeMF, ms };

@@ -10,12 +10,8 @@ const MIN_DEPTH = 20;
 // Column-major, like every Mat4 Manifold takes.
 const TURN_TO_SIDE: Mat4 = [0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1];
 
-export type MeshData = {
-  /** xyz per vertex */
-  positions: Float32Array;
-  /** three vertex indices per triangle */
-  triangles: Uint32Array;
-};
+export type { MeshData } from "@/lib/threemf";
+import type { MeshData } from "@/lib/threemf";
 
 /**
  * The same construction as the JSCAD generator, on Manifold: letter `i` of

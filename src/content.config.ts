@@ -13,6 +13,17 @@ const projects = defineCollection({
     }),
 });
 
+// Optional build write-up for a project: src/content/projects/<slug>/build.mdx.
+// Shown on its own page (/projects/<slug>/build), linked from the project, so
+// the project page can stay about the project itself.
+const builds = defineCollection({
+  loader: glob({ pattern: "**/build.mdx", base: "./src/content/projects" }),
+  schema: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+  }),
+});
+
 const notes = defineCollection({
   loader: glob({ pattern: "**/index.mdx", base: "./src/content/notes" }),
   schema: z.object({
@@ -25,4 +36,4 @@ const notes = defineCollection({
   }),
 });
 
-export const collections = { projects, notes };
+export const collections = { projects, builds, notes };

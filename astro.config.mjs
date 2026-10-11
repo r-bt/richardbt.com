@@ -29,5 +29,10 @@ export default defineConfig({
     },
     // The nameplate generator's worker imports ES modules and WASM.
     worker: { format: "es" },
+    // wasm-swarmalators (wasm-pack output) finds its .wasm file relative to its
+    // own module. Vite's dev pre-bundling moves the module into
+    // node_modules/.vite/deps, where the .wasm isn't, so the simulation fails to
+    // load in dev. Serve it from its own package instead.
+    optimizeDeps: { exclude: ["wasm-swarmalators"] },
   },
 });

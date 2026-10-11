@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { createMaze } from "./maze";
 import { drawMaze } from "./draw_maze";
 import letters from "./letters";
 import Button from "./Button";
+import type { MazeData } from "./tube";
+
+// The tube uses a Web Worker, WASM and three.js, so it's only loaded in the
+// browser.
+const TubeMaze = lazy(() => import("./TubeMaze"));
 
 const DEFAULT_MESSAGE = "Hello";
 const MIN_SIZE = 10;
@@ -22,6 +27,7 @@ export default function MazeGenerator() {
   const [heightInput, setHeightInput] = useState("25");
   const [showSolution, setShowSolution] = useState<boolean>(true);
   const [svgs, setSvgs] = useState<{ solved: string; unsolved: string }>();
+  const [maze, setMaze] = useState<MazeData>();
 
   const width = parseSize(widthInput);
   const height = parseSize(heightInput);
@@ -37,12 +43,9 @@ export default function MazeGenerator() {
     if (width === null || height === null) return;
 
     const timer = setTimeout(() => {
-      const { passages, letterPoints, extraPathPoints, width: w, height: h } = createMaze(
-        width,
-        height,
-        mazeText,
-        true
-      );
+      const created = createMaze(width, height, mazeText, true);
+      const { passages, letterPoints, extraPathPoints, width: w, height: h } = created;
+      setMaze(created);
       setSvgs({
         solved: drawMaze(passages, w, h, letterPoints, extraPathPoints),
         unsolved: drawMaze(passages, w, h, [], []),
@@ -169,6 +172,15 @@ export default function MazeGenerator() {
               Download solution
             </Button>
           </div>
+        </div>
+      )}
+
+      {maze && (
+        <div className="mt-5 border-t border-rule pt-4">
+          <h3 className="ui-label">3D print as a tube</h3>
+          <Suspense fallback={<p className="ui-hint pt-5">Loading…</p>}>
+            <TubeMaze maze={maze} />
+          </Suspense>
         </div>
       )}
     </div>

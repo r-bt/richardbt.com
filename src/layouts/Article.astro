@@ -11,14 +11,18 @@ interface Props {
   meta?: string[];
   hero?: ImageMetadata;
   draft?: boolean;
+  /** Where the link at the bottom goes; defaults to the section's list. */
+  back?: { href: string; label: string };
+  /** Browser tab title, when it should differ from the heading. */
+  pageTitle?: string;
 }
 
-const { section, title, description, meta = [], hero, draft = false } = Astro.props;
+const { section, title, description, meta = [], hero, draft = false, back, pageTitle } = Astro.props;
 
 const sectionLabel = { notes: "Notes", projects: "Projects" }[section];
 ---
 
-<Shell title={title} description={description} section={section}>
+<Shell title={pageTitle ?? title} description={description} section={section}>
   <article class="article">
     <header class="article-header">
       <p class="eyebrow meta">
@@ -41,7 +45,9 @@ const sectionLabel = { notes: "Notes", projects: "Projects" }[section];
     <slot />
 
     <p class="meta mt-16">
-      <a href={`/${section}`} class="quiet-link bare">← All {sectionLabel.toLowerCase()}</a>
+      <a href={back?.href ?? `/${section}`} class="quiet-link bare">
+        {back?.label ?? `← All ${sectionLabel.toLowerCase()}`}
+      </a>
     </p>
   </article>
 </Shell>

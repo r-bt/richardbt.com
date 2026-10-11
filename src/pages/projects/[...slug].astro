@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content";
 import Article from "../../layouts/Article.astro";
-import { getProjects, slugOf, topicsOf, type Project } from "../../lib/content";
+import { getBuild, getProjects, slugOf, topicsOf, type Project } from "../../lib/content";
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -14,6 +14,8 @@ export async function getStaticPaths() {
 const { project } = Astro.props as { project: Project };
 const { Content } = await render(project);
 const { title, description, publishDate, thumbnail } = project.data;
+const slug = slugOf(project.id);
+const build = await getBuild(slug);
 ---
 
 <Article
@@ -24,4 +26,12 @@ const { title, description, publishDate, thumbnail } = project.data;
   hero={thumbnail}
 >
   <Content />
+  {
+    build && (
+      <a class="build-link bare" href={`/projects/${slug}/build`}>
+        <span class="build-link-title">{build.data.title ?? "How it was made"}</span>
+        <span aria-hidden="true" class="build-link-arrow">→</span>
+      </a>
+    )
+  }
 </Article>
