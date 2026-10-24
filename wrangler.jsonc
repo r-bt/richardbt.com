@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "richardbt-com",
+  "compatibility_date": "2026-10-01",
+  // The site is fully static, so Cloudflare serves the Astro build output
+  // directly. No Worker script is needed.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "richardbt.com", "custom_domain": true },
+    { "pattern": "www.richardbt.com", "custom_domain": true }
+  ]
+}
