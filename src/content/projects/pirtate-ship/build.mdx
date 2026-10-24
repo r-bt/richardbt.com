@@ -1,0 +1,50 @@
+import PirateShipViewer from "./PirateShipViewer";
+
+I began by sketching the profiles of the hull. I added a spline at the top and bottom of the end piece to use as rails while lofting, which gives the ship its distinctive curved end.
+
+![Sketch of the ship hull profiles](./sketch-of-ship-hull.png)
+*Sketch of ship hull*
+
+I extruded and cut a rectangular section into the front of the boat for the captain's quarters.
+
+![Hull with captain's quarters added](./captains-quarters.png)
+*Adding captain's quarters*
+
+Then came the posts along the sides of the boat.
+
+![Wall posts sketched and revolved](./ship-wall-posts.png)
+*Sketching and revolving ship wall posts*
+
+In a separate file, I designed a ship's wheel and linked it into the ship.
+
+![Ship's wheel](./ship-wheel.png)
+*Ship's wheel*
+
+![Wheel mounted on the ship](./wheel-on-ship.png)
+*Wheel on the ship*
+
+I wanted to convey the sense of the sails under wind. To do this I drew splines in a 3D sketch and used them as rails when lofting between the curved top and bottom of each sail.
+
+![Ship with masts and sails](./sails-on-ship.png)
+*Sails on the ship*
+
+<PirateShipViewer client:only="react" />
+
+## 3D printing
+
+I used an Ultimaker S5 to 3D print the pirate ship which has a dual-extruder so I could use PVA for water-soluble supports.
+
+![Pirate ship sliced in Cura](./slicing-pirate-ship.jpg)
+*Slicing pirate ship in Cura*
+
+Unfortunately I don't have any pictures of the boat with all the supports, however it took 5 days in a bath of water for everything to dissolve. Once it was in the water, I also realised it doesn't actually work as a boat: it sinks. I'm not too disappointed, since I didn't design it to float, but I'd love to try making a boat that does.
+
+<div class="side-by-side">
+
+![Finished pirate ship from the side](./finished-pirate-ship.jpg)
+*Side view of finished pirate ship*
+
+![Finished pirate ship from the back](./finished-pirate-ship2.jpg)
+*Back view of finished pirate ship*
+
+</div>
