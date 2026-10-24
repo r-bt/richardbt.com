@@ -1,6 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "richardbt-com",
+  // The account that owns the richardbt.com zone.
+  "account_id": "5f02ae4519fc4a3f926d98defaa356de",
   "compatibility_date": "2026-10-01",
   // The site is fully static, so Cloudflare serves the Astro build output
   // directly. No Worker script is needed.
