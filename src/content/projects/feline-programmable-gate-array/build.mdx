@@ -1,3 +1,5 @@
+import LocalizationDemo from "./LocalizationDemo";
+
 ## Design goals
 
 The goals for the project were:
@@ -18,7 +20,9 @@ Below are my parts. For the full details, read our [report](/6_2050_Final_Report
 
 We used [SPH0645LM4H-B](https://www.adafruit.com/product/3421) I2S MEMS microphones on an Adafruit breakout boards. 
 
-To localize something from sound we needed four microphones: three arranged in a triangle around one central microphone. The idea is that there will be a time delay between when the sound reaches each microphone (encoded in the phase of the audio signal). Based on this time delay you can work out the location.
+To localize something from sound we needed four microphones: three arranged in a triangle around one central microphone. The idea is that there will be a time delay between when the sound reaches each microphone (encoded in the phase of the audio signal). Based on this time delay you can work out the location. We placed the microphones on a 3 cm grid. Speech tops out around 3 kHz, where the wavelength is 11.44 cm, so keeping every microphone within half a wavelength (5.72 cm) of the centre means the phase difference can't wrap past ±180° and point the wrong way (spatial aliasing).
+
+<LocalizationDemo client:only="react" />
 
 The microphones send audio over I<sup>2</sup>S. In standard I2S, data is written on the _falling edge_ of the serial clock (SCK):
 
