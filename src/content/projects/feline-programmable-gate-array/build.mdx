@@ -18,49 +18,35 @@ Below are my parts. For the full details, read our [report](/6_2050_Final_Report
 
 ## Audio input
 
-We used [SPH0645LM4H-B](https://www.adafruit.com/product/3421) I2S MEMS microphones on an Adafruit breakout boards. 
+We used [SPH0645LM4H-B](https://www.adafruit.com/product/3421) I2S MEMS microphones on Adafruit breakout boards.
 
-To localize something from sound we needed four microphones: three arranged in a triangle around one central microphone. The idea is that there will be a time delay between when the sound reaches each microphone (encoded in the phase of the audio signal). Based on this time delay you can work out the location. We placed the microphones on a 3 cm grid. Speech tops out around 3 kHz, where the wavelength is 11.44 cm, so keeping every microphone within half a wavelength (5.72 cm) of the centre means the phase difference can't wrap past ±180° and point the wrong way (spatial aliasing).
+To localize something from sound we needed four microphones: three arranged in a triangle around one central microphone. The idea is that there will be a time delay between when the sound reaches each microphone (encoded in the phase of the audio signal). Based on this time delay you can work out the location. We placed the microphones on a 3 cm grid: if the mics were further apart than half a wavelength, the timing would become ambiguous.
 
-<LocalizationDemo client:only="react" />
+The microphones speak a slightly non-standard version of the usual I<sup>2</sup>S protocol, so I wrote my own receiver.
 
-The microphones send audio over I<sup>2</sup>S. In standard I2S, data is written on the _falling edge_ of the serial clock (SCK):
+The audio was initially very quiet from these microphones. I noticed the six most significant bits they sent were always 1. Left-shifting the audio by six bits made it much louder and easier to work with.
 
-![Standard I2S timing diagram. DATA changes on the falling edge of the clock](./i2s-standard.png)
-*Standard I2S: data changes on the falling edge of the clock*
+### Filtering
 
-The SPH0645LM4H-B, however, writes data on the _rising edge_:
-
-![SPH0645LM4H-B timing diagram. DATA changes on the rising edge of the clock](./i2s-microphones.png)
-*SPH0645LM4H-B: data changes on the rising edge of the clock*
-
-So I wrote a custom I<sup>2</sup>S controller, which generates the serial clock (SCK) and word select (WS) signals, and a receiver that reads the data from the microphones.
-
-The audio was initally very quiet from these microphones. I noticed the six most significant bits they sent were always 1. Left-shifting the audio by six bits made it much louder and easier to work with.
-
-### Filtering and decimating
-
-Human speech typically sits between 20 Hz and 3 kHz, but we sampled at 32 kHz, so I passed the audio through a low-pass finite impulse response (FIR) filter. I used the Xilinx FIR Compiler IP, which also supports decimation, to bring the sample rate down to 8 kHz.
-
-### Phase and amplitude
-
-Both localization and voice biometrics needed the phase and amplitude of the signal. I used the Xilinx FFT LogiCORE™ IP with four channels (one per microphone) on 512 samples, which we found experimentally balanced resource usage and accuracy.
+Human speech typically sits between 20 Hz and 3 kHz, but we sampled at 32 kHz, so I filtered out everything above speech and kept only every eighth sample, bringing the sample rate down to 4 kHz.
 
 ## Sound localization
 
 The phase difference between microphones tells you the direction of the sound source.
 
-I took the 512 FFT coefficients and discarded the upper 256, since by the Nyquist–Shannon sampling theorem only the lower 256 are usable. Then I converted them from rectangular to polar form. For each frequency I:
+An FFT splits the sound into its individual frequencies, and each one gives its own estimate of direction. I kept the frequencies in the range of human speech, roughly 100 Hz to 2.65 kHz (216 of them). For each frequency I:
 
 1. Calculated the phase difference between the central microphone and each of the others
-2. Scaled each peripheral microphone by the phase difference and the amplitude at the central microphone
-3. Summed the scaled locations
-4. Assigned the resulting direction vector to one of 16 bins
+2. Scaled each peripheral microphone's position by its phase difference
+3. Summed the scaled positions to get a direction
+4. Assigned the direction to one of 16 bins, adding its strength to that bin
+
+<LocalizationDemo client:only="react" />
 
 ![Structure of localization module](./localization-process.png)
 *Structure of the localization module*
 
-Once all 256 frequencies are processed, the bin with the greatest magnitude gives the direction of the sound source.
+Once all 216 frequencies are processed, the bin with the greatest total gives the direction of the sound source.
 
 ![16 angle bins and their corresponding angles](./bins.png)
 *The 16 angle bins*
@@ -69,6 +55,16 @@ Once all 256 frequencies are processed, the bin with the greatest magnitude give
 
 To test localization, I generated PWM signals to drive a servo, mapping each bin to a different duty cycle so the servo pointed at that angle. Once the servo could consistently point towards me when I spoke I was confident the localization was working.
 
-## DC motor control
+### DC motor control
 
 Initially I tried using continuous servos to move the robot, but they made enough noise to interfere with localization. Instead we used two Adafruit DC Gearbox TT Motors. These have three inputs: IN1, IN2 and EN. IN1 and IN2 set the direction, and since the motors only ever turned clockwise, they were always low and high respectively. EN enables the motor, so I drove it with a PWM signal to vary the speed. I chose 20 kHz so it wouldn't interfere with localization or voice biometrics.
+
+### Steering
+
+The robot only moves if it recognizes its owner's voice. Then it steers by the winning bin: bins 6–11 (on its left) turn on only the right motor, bins 0–2 and 12–15 (on its right) only the left, and bins 3–5 (in front) both.
+
+## Results
+
+When everything came together, the robot recognized its owner's voice, turned towards them and drove over. With someone else talking it moved much less, often not at all.
+
+It wasn't perfect. Voice recognition gave false positives for people with a similar pitch to the owner. Localization also struggled with pauses in speech, until we added a volume threshold so the robot ignores quiet moments and keeps heading the way it was going.
