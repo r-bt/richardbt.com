@@ -1,0 +1,70 @@
+## Design goals
+
+The goals for the project were:
+
+- I2S audio input (Richard)
+- MFCC feature extraction (Andi)
+- Bluetooth communication (Andi)
+- Real-time SVM inference (Andi)
+- Motor control (Richard)
+- Real-time audio localization (Richard)
+
+![System overview diagram](./block-diagram.png)
+*System overview*
+
+Below are my parts. For the full details, read our [report](/6_2050_Final_Report.pdf) or see the [code](https://github.com/dolphingarlic/feline-programmable-gate-array).
+
+## Audio input
+
+We used [SPH0645LM4H-B](https://www.adafruit.com/product/3421) I2S MEMS microphones on an Adafruit breakout boards. 
+
+To localize something from sound we needed four microphones: three arranged in a triangle around one central microphone. The idea is that there will be a time delay between when the sound reaches each microphone (encoded in the phase of the audio signal). Based on this time delay you can work out the location.
+
+The microphones send audio over I<sup>2</sup>S. In standard I2S, data is written on the _falling edge_ of the serial clock (SCK):
+
+![Standard I2S timing diagram. DATA changes on the falling edge of the clock](./i2s-standard.png)
+*Standard I2S: data changes on the falling edge of the clock*
+
+The SPH0645LM4H-B, however, writes data on the _rising edge_:
+
+![SPH0645LM4H-B timing diagram. DATA changes on the rising edge of the clock](./i2s-microphones.png)
+*SPH0645LM4H-B: data changes on the rising edge of the clock*
+
+So I wrote a custom I<sup>2</sup>S controller, which generates the serial clock (SCK) and word select (WS) signals, and a receiver that reads the data from the microphones.
+
+The audio was initally very quiet from these microphones. I noticed the six most significant bits they sent were always 1. Left-shifting the audio by six bits made it much louder and easier to work with.
+
+### Filtering and decimating
+
+Human speech typically sits between 20 Hz and 3 kHz, but we sampled at 32 kHz, so I passed the audio through a low-pass finite impulse response (FIR) filter. I used the Xilinx FIR Compiler IP, which also supports decimation, to bring the sample rate down to 8 kHz.
+
+### Phase and amplitude
+
+Both localization and voice biometrics needed the phase and amplitude of the signal. I used the Xilinx FFT LogiCORE™ IP with four channels (one per microphone) on 512 samples, which we found experimentally balanced resource usage and accuracy.
+
+## Sound localization
+
+The phase difference between microphones tells you the direction of the sound source.
+
+I took the 512 FFT coefficients and discarded the upper 256, since by the Nyquist–Shannon sampling theorem only the lower 256 are usable. Then I converted them from rectangular to polar form. For each frequency I:
+
+1. Calculated the phase difference between the central microphone and each of the others
+2. Scaled each peripheral microphone by the phase difference and the amplitude at the central microphone
+3. Summed the scaled locations
+4. Assigned the resulting direction vector to one of 16 bins
+
+![Structure of localization module](./localization-process.png)
+*Structure of the localization module*
+
+Once all 256 frequencies are processed, the bin with the greatest magnitude gives the direction of the sound source.
+
+![16 angle bins and their corresponding angles](./bins.png)
+*The 16 angle bins*
+
+## Motor control
+
+To test localization, I generated PWM signals to drive a servo, mapping each bin to a different duty cycle so the servo pointed at that angle. Once the servo could consistently point towards me when I spoke I was confident the localization was working.
+
+## DC motor control
+
+Initially I tried using continuous servos to move the robot, but they made enough noise to interfere with localization. Instead we used two Adafruit DC Gearbox TT Motors. These have three inputs: IN1, IN2 and EN. IN1 and IN2 set the direction, and since the motors only ever turned clockwise, they were always low and high respectively. EN enables the motor, so I drove it with a PWM signal to vary the speed. I chose 20 kHz so it wouldn't interfere with localization or voice biometrics.
