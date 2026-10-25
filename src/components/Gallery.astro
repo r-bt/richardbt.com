@@ -38,20 +38,28 @@ const photos = await Promise.all(
 <div class="gallery wide" data-gallery>
   <div class="gallery-grid">
     {
-      photos.map(({ src, caption }, i) => (
-        <figure class="gallery-item">
-          <button type="button" class="gallery-open" data-index={i} aria-label={`View larger: ${caption}`}>
-            <Image
-              class="gallery-thumb"
-              src={src}
-              alt={caption}
-              widths={[320, 480, 720]}
-              sizes="(min-width: 50rem) 16rem, (min-width: 640px) 31vw, 46vw"
-            />
-          </button>
-          <figcaption>{caption}</figcaption>
-        </figure>
-      ))
+      photos.map(({ src, caption }, i) => {
+        // Landscape photos take two columns so they aren't cropped to a sliver.
+        const landscape = src.width > src.height;
+        return (
+          <figure class:list={["gallery-item", { landscape }]}>
+            <button type="button" class="gallery-open" data-index={i} aria-label={`View larger: ${caption}`}>
+              <Image
+                class="gallery-thumb"
+                src={src}
+                alt={caption}
+                widths={landscape ? [640, 960, 1440] : [320, 480, 720]}
+                sizes={
+                  landscape
+                    ? "(min-width: 50rem) 33rem, (min-width: 640px) 64vw, 92vw"
+                    : "(min-width: 50rem) 16rem, (min-width: 640px) 31vw, 46vw"
+                }
+              />
+            </button>
+            <figcaption>{caption}</figcaption>
+          </figure>
+        );
+      })
     }
   </div>
 
@@ -132,20 +140,28 @@ const photos = await Promise.all(
   }
 
   .gallery-grid {
+    --column-gap: 0.875rem;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem 0.875rem;
+    /* Let later portrait photos fill holes left beside a landscape one. */
+    grid-auto-flow: dense;
+    gap: 1.25rem var(--column-gap);
   }
 
   @media (min-width: 640px) {
     .gallery-grid {
+      --column-gap: 1.25rem;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.75rem 1.25rem;
+      row-gap: 1.75rem;
     }
   }
 
   .gallery-item {
     margin: 0;
+  }
+
+  .gallery-item.landscape {
+    grid-column: span 2;
   }
 
   .gallery-open {
@@ -157,6 +173,7 @@ const photos = await Promise.all(
     overflow: hidden;
     background: var(--tint);
     cursor: zoom-in;
+    container-type: inline-size;
   }
 
   /* Beats the article's own image rules, which size images for running text. */
@@ -169,6 +186,13 @@ const photos = await Promise.all(
     object-fit: cover;
     border-radius: 0;
     transition: transform 300ms ease;
+  }
+
+  /* As tall as a portrait card beside it: two columns wide, minus the gap,
+     gives one column's width, and a portrait card is 4/3 of that. */
+  .gallery .landscape .gallery-thumb {
+    aspect-ratio: auto;
+    height: calc((100cqi - var(--column-gap)) / 2 * 4 / 3);
   }
 
   .gallery-open:hover .gallery-thumb {
